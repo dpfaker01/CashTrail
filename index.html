@@ -3,25 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- Theme Colors -->
     <meta name="theme-color" content="#0f172a">
-    <meta name="msapplication-TileColor" content="#0f172a">
-    
-    <!-- Apple/iOS Support -->
+    <meta name="description" content="Withdrawal-to-Expense Ledger - Track every penny from bank to spend">
+    <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icon-192x192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="CashTrail">
-    
-    <!-- App Info -->
-    <meta name="description" content="Withdrawal-to-Expense Ledger - Track every penny from bank to spend">
     <title>CashTrail - Withdrawal to Expense Tracker</title>
     
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
@@ -1370,6 +1360,21 @@
             </div>
         </div>
 
+        <!-- Modal: History (FULL TRANSACTION HISTORY) - THIS WAS MISSING -->
+        <div class="modal-overlay" id="modalHistory">
+            <div class="modal-sheet" style="max-height: 95vh;">
+                <div class="modal-header">
+                    <h3 class="modal-title">Full Transaction History</h3>
+                    <button class="modal-close" onclick="app.closeModal('history')">×</button>
+                </div>
+                <div class="modal-content">
+                    <div id="fullHistoryList" class="history-list">
+                        <!-- Dynamic content populated by renderFullHistory() -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Modal: Settings -->
         <div class="modal-overlay" id="modalSettings">
             <div class="modal-sheet">
@@ -2593,6 +2598,13 @@
 
             renderFullHistory() {
                 const container = document.getElementById('fullHistoryList');
+                
+                // Safety check - if element doesn't exist, log error and return
+                if (!container) {
+                    console.error('History modal container not found: fullHistoryList');
+                    return;
+                }
+                
                 const allTransactions = [
                     ...this.state.withdrawals.map(w => ({...w, displayType: 'withdrawal'})),
                     ...this.state.expenses.map(e => ({...e, displayType: 'expense'})),
@@ -2771,14 +2783,29 @@
             app = new CashTrailApp();
         });
 
-        // Service Worker
+        // Register Service Worker
         if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then((reg) => console.log('SW registered:', reg.scope))
-      .catch((err) => console.log('SW failed:', err));
-  });
-}
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('CashTrail: SW registered:', registration.scope);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New version available
+                                    if (confirm('New version of CashTrail available! Reload to update?')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((err) => console.log('CashTrail: SW registration failed:', err));
+            });
+        }
     </script>
 </body>
 </html>

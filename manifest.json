@@ -61,31 +61,8 @@
       "purpose": "any"
     }
   ],
-  "screenshots": [
-    {
-      "src": "screenshot-mobile.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "CashTrail Dashboard"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Record Expense",
-      "short_name": "Expense",
-      "description": "Quickly record a new expense",
-      "url": "/CashTrail/?action=expense",
-      "icons": [{ "src": "icon-96x96.png", "sizes": "96x96" }]
-    },
-    {
-      "name": "Record Withdrawal",
-      "short_name": "Withdrawal",
-      "description": "Quickly record a new withdrawal",
-      "url": "/CashTrail/?action=withdrawal",
-      "icons": [{ "src": "icon-96x96.png", "sizes": "96x96" }]
-    }
-  ],
+  "screenshots": [],
+  "shortcuts": [],
   "related_applications": [],
   "prefer_related_applications": false
 }

@@ -2,79 +2,72 @@
   "name": "CashTrail - Withdrawal to Expense Tracker",
   "short_name": "CashTrail",
   "description": "Track every penny from bank to spend. A precise withdrawal-to-expense ledger for managing your cash flow.",
-  "start_url": "/",
+  "start_url": "/CashTrail/",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#0f172a",
   "orientation": "portrait",
-  "scope": "/",
+  "scope": "/CashTrail/",
   "lang": "en",
   "dir": "ltr",
   "categories": ["finance", "productivity", "utilities"],
   "icons": [
     {
-      "src": "icons/icon-72x72.png",
+      "src": "icon-72x72.png",
       "sizes": "72x72",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
     },
     {
-      "src": "icons/icon-96x96.png",
+      "src": "icon-96x96.png",
       "sizes": "96x96",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
     },
     {
-      "src": "icons/icon-128x128.png",
+      "src": "icon-128x128.png",
       "sizes": "128x128",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
     },
     {
-      "src": "icons/icon-144x144.png",
+      "src": "icon-144x144.png",
       "sizes": "144x144",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
     },
     {
-      "src": "icons/icon-152x152.png",
+      "src": "icon-152x152.png",
       "sizes": "152x152",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
     },
     {
-      "src": "icons/icon-192x192.png",
+      "src": "icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
     },
     {
-      "src": "icons/icon-384x384.png",
+      "src": "icon-384x384.png",
       "sizes": "384x384",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
     },
     {
-      "src": "icons/icon-512x512.png",
+      "src": "icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
     }
   ],
   "screenshots": [
     {
-      "src": "screenshots/dashboard.png",
+      "src": "screenshot-mobile.png",
       "sizes": "1080x1920",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "CashTrail Dashboard showing cash on hand and active withdrawals"
-    },
-    {
-      "src": "screenshots/desktop.png",
-      "sizes": "1920x1080",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "CashTrail Desktop View"
+      "label": "CashTrail Dashboard"
     }
   ],
   "shortcuts": [
@@ -82,15 +75,15 @@
       "name": "Record Expense",
       "short_name": "Expense",
       "description": "Quickly record a new expense",
-      "url": "/?action=expense",
-      "icons": [{ "src": "icons/expense-96x96.png", "sizes": "96x96" }]
+      "url": "/CashTrail/?action=expense",
+      "icons": [{ "src": "icon-96x96.png", "sizes": "96x96" }]
     },
     {
       "name": "Record Withdrawal",
       "short_name": "Withdrawal",
       "description": "Quickly record a new withdrawal",
-      "url": "/?action=withdrawal",
-      "icons": [{ "src": "icons/withdrawal-96x96.png", "sizes": "96x96" }]
+      "url": "/CashTrail/?action=withdrawal",
+      "icons": [{ "src": "icon-96x96.png", "sizes": "96x96" }]
     }
   ],
   "related_applications": [],

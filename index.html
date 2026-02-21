@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0f172a">
     <meta name="description" content="Withdrawal-to-Expense Ledger - Track every penny from bank to spend">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="CashTrail">
@@ -52,7 +51,6 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
         }
 
         html {
@@ -61,20 +59,14 @@
             background: var(--bg-primary);
             color: var(--text-primary);
             height: 100%;
-            overflow: hidden;
             transition: background 0.3s, color 0.3s;
-            touch-action: pan-y pinch-zoom;
         }
 
         body {
             height: 100%;
-            overflow: hidden;
             display: flex;
             flex-direction: column;
-            touch-action: pan-y;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
+            overflow: hidden; /* Prevent body scroll, app handles it */
         }
 
         #app {
@@ -87,7 +79,7 @@
             background: var(--bg-primary);
             position: relative;
             transition: background 0.3s;
-            overflow: hidden;
+            overflow: hidden; /* App container handles layout */
         }
 
         .app-header {
@@ -135,7 +127,9 @@
             cursor: pointer;
             transition: all 0.2s;
             font-size: 1.1rem;
-            touch-action: manipulation;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .icon-btn:hover {
@@ -151,12 +145,11 @@
 
         .main-content {
             flex: 1;
-            overflow-y: auto;
+            overflow-y: auto; /* Enable vertical scrolling */
             overflow-x: hidden;
             padding: var(--spacing-md);
             scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-            overscroll-behavior-y: contain;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
         }
 
         .cash-hero {
@@ -348,7 +341,6 @@
             display: flex;
             align-items: center;
             gap: 0.25rem;
-            touch-action: manipulation;
         }
 
         .btn-small:hover {
@@ -456,7 +448,6 @@
             align-items: center;
             justify-content: center;
             transition: transform 0.2s;
-            touch-action: manipulation;
         }
 
         .fab:active {
@@ -487,7 +478,6 @@
             cursor: pointer;
             white-space: nowrap;
             box-shadow: var(--shadow-lg);
-            touch-action: manipulation;
         }
 
         .fab-option-icon {
@@ -569,7 +559,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            touch-action: manipulation;
         }
 
         .modal-content {
@@ -601,7 +590,6 @@
             font-size: 1rem;
             transition: border-color 0.2s;
             font-variant-numeric: tabular-nums;
-            touch-action: manipulation;
         }
 
         .form-input:focus, .form-select:focus {
@@ -659,7 +647,6 @@
             border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.2s;
-            touch-action: manipulation;
         }
 
         .source-option:hover {
@@ -743,7 +730,6 @@
             align-items: center;
             justify-content: center;
             gap: var(--spacing-sm);
-            touch-action: manipulation;
         }
 
         .btn-primary {
@@ -787,7 +773,6 @@
             border: 1px solid var(--border-subtle);
             cursor: pointer;
             transition: all 0.2s;
-            touch-action: manipulation;
         }
 
         .history-item:hover {
@@ -910,7 +895,6 @@
             cursor: pointer;
             font-size: 0.875rem;
             transition: all 0.2s;
-            touch-action: manipulation;
         }
 
         .filter-btn:hover {
@@ -993,7 +977,6 @@
             cursor: pointer;
             transition: background 0.3s;
             border: 1px solid var(--border-subtle);
-            touch-action: manipulation;
         }
 
         .theme-toggle.active {
@@ -1025,15 +1008,7 @@
                 border-right: 1px solid var(--border-subtle);
             }
         }
-        
-        /* Prevent text selection on mobile */
-        .no-select {
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            user-select: none;
-        }
     </style>
-<base target="_blank">
 <base target="_blank">
 </head>
 <body>
@@ -1470,7 +1445,7 @@
             constructor() {
                 this.state = {
                     currency: 'PHP',
-                    initialCashOnHand: 0, // Track initial cash separately
+                    initialCashOnHand: 0,
                     withdrawals: [],
                     expenses: [],
                     adjustments: [],
@@ -1532,37 +1507,35 @@
 
             // Calculate actual Cash on Hand dynamically
             getCashOnHand() {
-                // Start with initial cash on hand
                 let cash = this.state.initialCashOnHand || 0;
-                
-                // Add all withdrawals (money coming in)
                 const totalWithdrawals = this.state.withdrawals.reduce((sum, w) => sum + w.amount, 0);
                 cash += totalWithdrawals;
-                
-                // Subtract all expenses (money going out)
                 const totalExpenses = this.state.expenses.reduce((sum, e) => sum + e.amount, 0);
                 cash -= totalExpenses;
-                
-                // Apply adjustments
                 const totalAdjustments = this.state.adjustments.reduce((sum, a) => sum + a.difference, 0);
                 cash += totalAdjustments;
-                
                 return Math.max(0, cash);
             }
 
             applyTheme() {
                 const isDark = this.state.theme === 'dark';
                 document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-                document.getElementById('btnTheme').textContent = isDark ? '🌙' : '☀️';
+                
+                const btnTheme = document.getElementById('btnTheme');
+                if (btnTheme) {
+                    btnTheme.textContent = isDark ? '🌙' : '☀️';
+                }
                 
                 const toggle = document.getElementById('themeToggle');
                 if (toggle) {
                     if (isDark) {
                         toggle.classList.add('active');
-                        toggle.querySelector('.theme-toggle-slider').textContent = '🌙';
+                        const slider = toggle.querySelector('.theme-toggle-slider');
+                        if (slider) slider.textContent = '🌙';
                     } else {
                         toggle.classList.remove('active');
-                        toggle.querySelector('.theme-toggle-slider').textContent = '☀️';
+                        const slider = toggle.querySelector('.theme-toggle-slider');
+                        if (slider) slider.textContent = '☀️';
                     }
                 }
             }
@@ -1638,23 +1611,6 @@
                 document.getElementById('adjustmentAmount').addEventListener('input', (e) => {
                     this.calculateAdjustment(e.target.value);
                 });
-                
-                // Prevent zoom on double tap
-                let lastTouchEnd = 0;
-                document.addEventListener('touchend', (e) => {
-                    const now = Date.now();
-                    if (now - lastTouchEnd <= 300) {
-                        e.preventDefault();
-                    }
-                    lastTouchEnd = now;
-                }, false);
-                
-                // Prevent pinch zoom
-                document.addEventListener('touchmove', (e) => {
-                    if (e.scale !== 1) {
-                        e.preventDefault();
-                    }
-                }, { passive: false });
             }
 
             openModal(type) {
@@ -1703,13 +1659,11 @@
                     modal.classList.remove('active');
                     document.body.style.overflow = '';
                     
-                    // Reset forms
                     if (['withdrawal', 'expense', 'adjustment'].includes(type)) {
                         this.resetForm(type);
                     }
                 }
                 
-                // Close FAB menu
                 document.getElementById('fabMenu').classList.remove('open');
                 document.getElementById('fabMain').textContent = '+';
             }
@@ -1733,7 +1687,6 @@
                     document.getElementById('withdrawalIdHint').style.display = 'block';
                 }
                 
-                // Reset date to today
                 const today = new Date().toISOString().split('T')[0];
                 const dateInput = document.getElementById(`${type}Date`);
                 if (dateInput) dateInput.value = today;
@@ -1756,13 +1709,11 @@
 
                 this.openModal(type);
                 
-                // Set edit mode
                 document.getElementById(`${type}EditId`).value = id;
                 document.getElementById(`${type}ModalTitle`).textContent = `Edit ${type.charAt(0).toUpperCase() + type.slice(1)}`;
                 document.getElementById(`${type}SubmitBtn`).style.display = 'none';
                 document.getElementById(`${type}EditActions`).style.display = 'flex';
 
-                // Populate fields
                 if (type === 'withdrawal') {
                     document.getElementById('withdrawalAmount').value = item.amount;
                     document.getElementById('withdrawalSource').value = item.source;
@@ -1914,7 +1865,6 @@
                 const ref = document.getElementById('withdrawalRef').value;
 
                 if (editId) {
-                    // Edit mode
                     const w = this.state.withdrawals.find(w => w.id === editId);
                     if (w) {
                         const diff = amount - w.amount;
@@ -1925,7 +1875,6 @@
                         w.remaining += diff;
                     }
                 } else {
-                    // Create new
                     const formattedDate = date.replace(/-/g, '').slice(2);
                     const existing = this.state.withdrawals.filter(w => w.id.startsWith(`${source}-${formattedDate}`)).length;
                     const sequence = String(existing + 1).padStart(3, '0');
@@ -1977,12 +1926,9 @@
                 }
 
                 if (editId) {
-                    // Edit mode
                     const e = this.state.expenses.find(ex => ex.id === editId);
                     if (e) {
-                        // If changing source or amount, restore the old amount to old source first
                         if (e.withdrawalId !== withdrawalId || e.amount !== amount) {
-                            // Restore to old source
                             if (e.withdrawalId === 'CASH_ON_HAND') {
                                 // Old source was cash on hand - no action needed, will recalculate
                             } else {
@@ -1993,9 +1939,7 @@
                                 }
                             }
                             
-                            // Deduct from new source
                             if (withdrawalId === 'CASH_ON_HAND') {
-                                // Check if we have enough cash
                                 const currentCash = this.getCashOnHand();
                                 const oldCashImpact = e.withdrawalId === 'CASH_ON_HAND' ? e.amount : 0;
                                 const availableCash = currentCash + oldCashImpact;
@@ -2021,7 +1965,6 @@
                         e.withdrawalId = withdrawalId;
                     }
                 } else {
-                    // Create new
                     if (isCashOnHand) {
                         const currentCash = this.getCashOnHand();
                         if (currentCash < amount) {
@@ -2073,7 +2016,6 @@
                         a.reason = reason;
                         a.note = note;
                         a.date = date;
-                        // Recalculate difference based on current state
                         const prevBalance = this.getCashOnHand() - a.difference;
                         a.difference = actualAmount - prevBalance;
                     }
@@ -2108,7 +2050,6 @@
                 
                 const options = [];
                 
-                // Cash on Hand option
                 options.push({
                     id: 'CASH_ON_HAND',
                     displayId: '💵 CASH ON HAND',
@@ -2118,7 +2059,6 @@
                     disabled: currentCash <= 0 && selectedId !== 'CASH_ON_HAND'
                 });
                 
-                // Active withdrawals
                 this.state.withdrawals
                     .filter(w => w.remaining > 0 || w.id === selectedId)
                     .sort((a, b) => new Date(b.date) - new Date(a.date))
@@ -2172,11 +2112,8 @@
             }
 
             selectWithdrawalSource(id, element) {
-                // Remove selected from all
                 document.querySelectorAll('.source-option').forEach(el => el.classList.remove('selected'));
-                // Add to clicked
                 element.classList.add('selected');
-                // Set value
                 document.getElementById('selectedWithdrawalId').value = id;
             }
 
@@ -2620,7 +2557,6 @@
             renderFullHistory() {
                 const container = document.getElementById('fullHistoryList');
                 
-                // Safety check - if element doesn't exist, log error and return
                 if (!container) {
                     console.error('History modal container not found: fullHistoryList');
                     return;
@@ -2811,30 +2747,6 @@
         document.addEventListener('DOMContentLoaded', () => {
             app = new CashTrailApp();
         });
-
-        // Register Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then((registration) => {
-                        console.log('CashTrail: SW registered:', registration.scope);
-                        
-                        // Check for updates
-                        registration.addEventListener('updatefound', () => {
-                            const newWorker = registration.installing;
-                            newWorker.addEventListener('statechange', () => {
-                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    // New version available
-                                    if (confirm('New version of CashTrail available! Reload to update?')) {
-                                        window.location.reload();
-                                    }
-                                }
-                            });
-                        });
-                    })
-                    .catch((err) => console.log('CashTrail: SW registration failed:', err));
-            });
-        }
     </script>
 </body>
 </html>

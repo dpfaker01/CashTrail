@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0f172a">
     <meta name="description" content="Withdrawal-to-Expense Ledger - Track every penny from bank to spend">
     <link rel="manifest" href="manifest.json">
@@ -52,6 +52,7 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         html {
@@ -62,6 +63,7 @@
             height: 100%;
             overflow: hidden;
             transition: background 0.3s, color 0.3s;
+            touch-action: pan-y pinch-zoom;
         }
 
         body {
@@ -69,6 +71,10 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            touch-action: pan-y;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         #app {
@@ -81,6 +87,7 @@
             background: var(--bg-primary);
             position: relative;
             transition: background 0.3s;
+            overflow: hidden;
         }
 
         .app-header {
@@ -94,6 +101,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
         }
 
         [data-theme="light"] .app-header {
@@ -127,6 +135,7 @@
             cursor: pointer;
             transition: all 0.2s;
             font-size: 1.1rem;
+            touch-action: manipulation;
         }
 
         .icon-btn:hover {
@@ -147,6 +156,7 @@
             padding: var(--spacing-md);
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
         }
 
         .cash-hero {
@@ -338,6 +348,7 @@
             display: flex;
             align-items: center;
             gap: 0.25rem;
+            touch-action: manipulation;
         }
 
         .btn-small:hover {
@@ -445,6 +456,7 @@
             align-items: center;
             justify-content: center;
             transition: transform 0.2s;
+            touch-action: manipulation;
         }
 
         .fab:active {
@@ -475,6 +487,7 @@
             cursor: pointer;
             white-space: nowrap;
             box-shadow: var(--shadow-lg);
+            touch-action: manipulation;
         }
 
         .fab-option-icon {
@@ -535,6 +548,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
         }
 
         .modal-title {
@@ -555,12 +569,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            touch-action: manipulation;
         }
 
         .modal-content {
             flex: 1;
             overflow-y: auto;
             padding: var(--spacing-lg);
+            -webkit-overflow-scrolling: touch;
         }
 
         .form-group {
@@ -585,6 +601,7 @@
             font-size: 1rem;
             transition: border-color 0.2s;
             font-variant-numeric: tabular-nums;
+            touch-action: manipulation;
         }
 
         .form-input:focus, .form-select:focus {
@@ -642,6 +659,7 @@
             border-radius: var(--radius-md);
             cursor: pointer;
             transition: all 0.2s;
+            touch-action: manipulation;
         }
 
         .source-option:hover {
@@ -725,6 +743,7 @@
             align-items: center;
             justify-content: center;
             gap: var(--spacing-sm);
+            touch-action: manipulation;
         }
 
         .btn-primary {
@@ -768,6 +787,7 @@
             border: 1px solid var(--border-subtle);
             cursor: pointer;
             transition: all 0.2s;
+            touch-action: manipulation;
         }
 
         .history-item:hover {
@@ -890,6 +910,7 @@
             cursor: pointer;
             font-size: 0.875rem;
             transition: all 0.2s;
+            touch-action: manipulation;
         }
 
         .filter-btn:hover {
@@ -972,6 +993,7 @@
             cursor: pointer;
             transition: background 0.3s;
             border: 1px solid var(--border-subtle);
+            touch-action: manipulation;
         }
 
         .theme-toggle.active {
@@ -1003,7 +1025,15 @@
                 border-right: 1px solid var(--border-subtle);
             }
         }
+        
+        /* Prevent text selection on mobile */
+        .no-select {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
     </style>
+<base target="_blank">
 <base target="_blank">
 </head>
 <body>
@@ -1440,7 +1470,7 @@
             constructor() {
                 this.state = {
                     currency: 'PHP',
-                    cashOnHand: 0,
+                    initialCashOnHand: 0, // Track initial cash separately
                     withdrawals: [],
                     expenses: [],
                     adjustments: [],
@@ -1478,7 +1508,7 @@
                         const parsed = JSON.parse(saved);
                         this.state = { 
                             currency: 'PHP',
-                            cashOnHand: 0,
+                            initialCashOnHand: 0,
                             withdrawals: [],
                             expenses: [],
                             adjustments: [],
@@ -1500,6 +1530,26 @@
                 }
             }
 
+            // Calculate actual Cash on Hand dynamically
+            getCashOnHand() {
+                // Start with initial cash on hand
+                let cash = this.state.initialCashOnHand || 0;
+                
+                // Add all withdrawals (money coming in)
+                const totalWithdrawals = this.state.withdrawals.reduce((sum, w) => sum + w.amount, 0);
+                cash += totalWithdrawals;
+                
+                // Subtract all expenses (money going out)
+                const totalExpenses = this.state.expenses.reduce((sum, e) => sum + e.amount, 0);
+                cash -= totalExpenses;
+                
+                // Apply adjustments
+                const totalAdjustments = this.state.adjustments.reduce((sum, a) => sum + a.difference, 0);
+                cash += totalAdjustments;
+                
+                return Math.max(0, cash);
+            }
+
             applyTheme() {
                 const isDark = this.state.theme === 'dark';
                 document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
@@ -1515,12 +1565,6 @@
                         toggle.querySelector('.theme-toggle-slider').textContent = '☀️';
                     }
                 }
-            }
-
-            toggleTheme() {
-                this.state.theme = this.state.theme === 'dark' ? 'light' : 'dark';
-                this.applyTheme();
-                this.saveState();
             }
 
             bindEvents() {
@@ -1594,6 +1638,23 @@
                 document.getElementById('adjustmentAmount').addEventListener('input', (e) => {
                     this.calculateAdjustment(e.target.value);
                 });
+                
+                // Prevent zoom on double tap
+                let lastTouchEnd = 0;
+                document.addEventListener('touchend', (e) => {
+                    const now = Date.now();
+                    if (now - lastTouchEnd <= 300) {
+                        e.preventDefault();
+                    }
+                    lastTouchEnd = now;
+                }, false);
+                
+                // Prevent pinch zoom
+                document.addEventListener('touchmove', (e) => {
+                    if (e.scale !== 1) {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
             }
 
             openModal(type) {
@@ -1824,31 +1885,16 @@
                             alert('Cannot delete withdrawal with linked expenses. Delete expenses first or reassign them.');
                             return;
                         }
-                        this.state.cashOnHand -= w.remaining;
                         this.state.withdrawals.splice(idx, 1);
                     }
                 } else if (type === 'expense') {
                     const idx = this.state.expenses.findIndex(e => e.id === id);
                     if (idx > -1) {
-                        const e = this.state.expenses[idx];
-                        
-                        if (e.withdrawalId === 'CASH_ON_HAND') {
-                            this.state.cashOnHand += e.amount;
-                        } else {
-                            const w = this.state.withdrawals.find(w => w.id === e.withdrawalId);
-                            if (w) {
-                                w.remaining += e.amount;
-                                w.consumed = false;
-                            }
-                        }
-                        
                         this.state.expenses.splice(idx, 1);
                     }
                 } else if (type === 'adjustment') {
                     const idx = this.state.adjustments.findIndex(a => a.id === id);
                     if (idx > -1) {
-                        const a = this.state.adjustments[idx];
-                        this.state.cashOnHand -= a.difference;
                         this.state.adjustments.splice(idx, 1);
                     }
                 }
@@ -1877,7 +1923,6 @@
                         w.date = date;
                         w.reference = ref;
                         w.remaining += diff;
-                        this.state.cashOnHand += diff;
                     }
                 } else {
                     // Create new
@@ -1899,7 +1944,6 @@
                     };
 
                     this.state.withdrawals.unshift(withdrawal);
-                    this.state.cashOnHand += amount;
                 }
 
                 this.saveState();
@@ -1936,78 +1980,54 @@
                     // Edit mode
                     const e = this.state.expenses.find(ex => ex.id === editId);
                     if (e) {
-                        const oldWasCash = e.withdrawalId === 'CASH_ON_HAND';
-                        const newIsCash = withdrawalId === 'CASH_ON_HAND';
-                        const amountDiff = amount - e.amount;
-
-                        if (oldWasCash && newIsCash) {
-                            if (this.state.cashOnHand < amountDiff) {
-                                alert('Insufficient cash on hand');
-                                return;
-                            }
-                            this.state.cashOnHand -= amountDiff;
-                            e.amount = amount;
-                        } else if (oldWasCash && !newIsCash) {
-                            const w = this.state.withdrawals.find(w => w.id === withdrawalId);
-                            if (w.remaining < amount) {
-                                alert('Insufficient balance in selected withdrawal');
-                                return;
-                            }
-                            this.state.cashOnHand += e.amount;
-                            w.remaining -= amount;
-                            if (w.remaining <= 0) w.consumed = true;
-                            e.withdrawalId = withdrawalId;
-                            e.amount = amount;
-                        } else if (!oldWasCash && newIsCash) {
-                            const oldW = this.state.withdrawals.find(w => w.id === e.withdrawalId);
-                            if (this.state.cashOnHand < amount) {
-                                alert('Insufficient cash on hand');
-                                return;
-                            }
-                            oldW.remaining += e.amount;
-                            oldW.consumed = false;
-                            this.state.cashOnHand -= amount;
-                            e.withdrawalId = withdrawalId;
-                            e.amount = amount;
-                        } else {
-                            if (e.withdrawalId === withdrawalId) {
-                                const w = this.state.withdrawals.find(w => w.id === withdrawalId);
-                                if (w.remaining < amountDiff) {
-                                    alert('Insufficient balance in selected withdrawal');
-                                    return;
-                                }
-                                w.remaining -= amountDiff;
-                                if (w.remaining <= 0) w.consumed = true;
-                                else w.consumed = false;
-                                e.amount = amount;
+                        // If changing source or amount, restore the old amount to old source first
+                        if (e.withdrawalId !== withdrawalId || e.amount !== amount) {
+                            // Restore to old source
+                            if (e.withdrawalId === 'CASH_ON_HAND') {
+                                // Old source was cash on hand - no action needed, will recalculate
                             } else {
                                 const oldW = this.state.withdrawals.find(w => w.id === e.withdrawalId);
+                                if (oldW) {
+                                    oldW.remaining += e.amount;
+                                    oldW.consumed = false;
+                                }
+                            }
+                            
+                            // Deduct from new source
+                            if (withdrawalId === 'CASH_ON_HAND') {
+                                // Check if we have enough cash
+                                const currentCash = this.getCashOnHand();
+                                const oldCashImpact = e.withdrawalId === 'CASH_ON_HAND' ? e.amount : 0;
+                                const availableCash = currentCash + oldCashImpact;
+                                if (availableCash < amount) {
+                                    alert('Insufficient cash on hand');
+                                    return;
+                                }
+                            } else {
                                 const newW = this.state.withdrawals.find(w => w.id === withdrawalId);
                                 if (newW.remaining < amount) {
                                     alert('Insufficient balance in selected withdrawal');
                                     return;
                                 }
-                                oldW.remaining += e.amount;
-                                oldW.consumed = false;
                                 newW.remaining -= amount;
                                 if (newW.remaining <= 0) newW.consumed = true;
-                                e.withdrawalId = withdrawalId;
-                                e.amount = amount;
                             }
                         }
                         
+                        e.amount = amount;
                         e.category = category;
                         e.note = note;
                         e.date = date;
+                        e.withdrawalId = withdrawalId;
                     }
                 } else {
                     // Create new
                     if (isCashOnHand) {
-                        if (this.state.cashOnHand < amount) {
+                        const currentCash = this.getCashOnHand();
+                        if (currentCash < amount) {
                             alert('Insufficient cash on hand');
                             return;
                         }
-                        this.state.cashOnHand -= amount;
                     } else {
                         const withdrawal = this.state.withdrawals.find(w => w.id === withdrawalId);
                         if (withdrawal.remaining < amount) {
@@ -2049,17 +2069,16 @@
                 if (editId) {
                     const a = this.state.adjustments.find(adj => adj.id === editId);
                     if (a) {
-                        this.state.cashOnHand -= a.difference;
-                        const newDiff = actualAmount - a.previousBalance;
                         a.newBalance = actualAmount;
-                        a.difference = newDiff;
                         a.reason = reason;
                         a.note = note;
                         a.date = date;
-                        this.state.cashOnHand += newDiff;
+                        // Recalculate difference based on current state
+                        const prevBalance = this.getCashOnHand() - a.difference;
+                        a.difference = actualAmount - prevBalance;
                     }
                 } else {
-                    const previousBalance = this.state.cashOnHand;
+                    const previousBalance = this.getCashOnHand();
                     const difference = actualAmount - previousBalance;
 
                     const adjustment = {
@@ -2074,7 +2093,6 @@
                         createdAt: new Date().toISOString()
                     };
 
-                    this.state.cashOnHand = actualAmount;
                     this.state.adjustments.unshift(adjustment);
                 }
 
@@ -2086,6 +2104,7 @@
 
             renderSourceSelector(selectedId = null) {
                 const container = document.getElementById('expenseSourceSelector');
+                const currentCash = this.getCashOnHand();
                 
                 const options = [];
                 
@@ -2093,10 +2112,10 @@
                 options.push({
                     id: 'CASH_ON_HAND',
                     displayId: '💵 CASH ON HAND',
-                    balance: this.state.cashOnHand,
+                    balance: currentCash,
                     source: 'Direct Cash',
                     isCash: true,
-                    disabled: this.state.cashOnHand <= 0 && selectedId !== 'CASH_ON_HAND'
+                    disabled: currentCash <= 0 && selectedId !== 'CASH_ON_HAND'
                 });
                 
                 // Active withdrawals
@@ -2174,16 +2193,17 @@
             }
 
             prepareAdjustmentModal() {
+                const currentCash = this.getCashOnHand();
                 const balanceEl = document.getElementById('currentRecordedBalance');
                 if (balanceEl) {
-                    balanceEl.textContent = `${CurrencySymbols[this.state.currency]}${this.state.cashOnHand.toFixed(2)}`;
+                    balanceEl.textContent = `${CurrencySymbols[this.state.currency]}${currentCash.toFixed(2)}`;
                 }
                 const preview = document.getElementById('adjustmentPreview');
                 if (preview) preview.classList.add('hidden');
             }
 
             calculateAdjustment(actualAmount) {
-                const current = this.state.cashOnHand;
+                const current = this.getCashOnHand();
                 const actual = parseFloat(actualAmount) || 0;
                 const diff = actual - current;
                 
@@ -2465,7 +2485,8 @@
             }
 
             renderCashHero() {
-                document.getElementById('cashAmount').textContent = this.state.cashOnHand.toFixed(2);
+                const cashOnHand = this.getCashOnHand();
+                document.getElementById('cashAmount').textContent = cashOnHand.toFixed(2);
                 document.getElementById('currencyDisplay').textContent = this.state.currency;
                 
                 const active = this.state.withdrawals.filter(w => !w.consumed).length;
@@ -2737,12 +2758,20 @@
                     try {
                         const imported = JSON.parse(e.target.result);
                         
-                        if (!imported.withdrawals || !imported.expenses || typeof imported.cashOnHand !== 'number') {
+                        if (!imported.withdrawals || !imported.expenses || !Array.isArray(imported.withdrawals)) {
                             throw new Error('Invalid backup file format');
                         }
                         
                         if (confirm('This will replace all current data. Continue?')) {
-                            this.state = { ...this.state, ...imported };
+                            this.state = { 
+                                currency: imported.currency || 'PHP',
+                                initialCashOnHand: imported.initialCashOnHand || 0,
+                                withdrawals: imported.withdrawals || [],
+                                expenses: imported.expenses || [],
+                                adjustments: imported.adjustments || [],
+                                sequenceCounter: imported.sequenceCounter || {},
+                                theme: imported.theme || 'dark'
+                            };
                             this.applyTheme();
                             this.saveState();
                             this.render();
@@ -2761,7 +2790,7 @@
                     if (confirm('Double-check: All withdrawals, expenses, and adjustments will be lost. Continue?')) {
                         this.state = {
                             currency: this.state.currency,
-                            cashOnHand: 0,
+                            initialCashOnHand: 0,
                             withdrawals: [],
                             expenses: [],
                             adjustments: [],

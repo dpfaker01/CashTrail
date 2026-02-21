@@ -51,6 +51,7 @@
             padding: 0;
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         html {
@@ -66,7 +67,11 @@
             height: 100%;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Prevent body scroll, app handles it */
+            overflow: hidden;
+            touch-action: pan-y;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         #app {
@@ -79,7 +84,7 @@
             background: var(--bg-primary);
             position: relative;
             transition: background 0.3s;
-            overflow: hidden; /* App container handles layout */
+            overflow: hidden;
         }
 
         .app-header {
@@ -145,11 +150,12 @@
 
         .main-content {
             flex: 1;
-            overflow-y: auto; /* Enable vertical scrolling */
+            overflow-y: auto;
             overflow-x: hidden;
             padding: var(--spacing-md);
             scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
         }
 
         .cash-hero {
@@ -1436,6 +1442,30 @@
     </div>
 
     <script>
+        // Prevent zoom on double-tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(e) {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, { passive: false });
+
+        // Prevent pinch zoom
+        document.addEventListener('touchmove', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Prevent double-tap zoom on buttons
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
         const CurrencySymbols = {
             PHP: '₱', USD: '$', EUR: '€', GBP: '£', 
             JPY: '¥', SGD: 'S$', AUD: 'A$', CAD: 'C$'
@@ -1540,18 +1570,26 @@
                 }
             }
 
+            toggleTheme() {
+                this.state.theme = this.state.theme === 'dark' ? 'light' : 'dark';
+                this.applyTheme();
+                this.saveState();
+            }
+
             bindEvents() {
+                const self = this;
+                
                 // FAB Toggle
                 const fab = document.getElementById('fabMain');
                 const menu = document.getElementById('fabMenu');
                 
-                fab.addEventListener('click', (e) => {
+                fab.addEventListener('click', function(e) {
                     e.stopPropagation();
                     menu.classList.toggle('open');
                     fab.textContent = menu.classList.contains('open') ? '×' : '+';
                 });
 
-                document.addEventListener('click', (e) => {
+                document.addEventListener('click', function(e) {
                     if (!e.target.closest('.fab-container')) {
                         menu.classList.remove('open');
                         fab.textContent = '+';
@@ -1559,57 +1597,58 @@
                 });
 
                 // Modal close on overlay click
-                document.querySelectorAll('.modal-overlay').forEach(overlay => {
-                    overlay.addEventListener('click', (e) => {
+                document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+                    overlay.addEventListener('click', function(e) {
                         if (e.target === overlay) {
                             const modalType = overlay.id.replace('modal', '').toLowerCase();
-                            this.closeModal(modalType);
+                            self.closeModal(modalType);
                         }
                     });
                 });
 
-                // Header buttons - explicit binding
-                document.getElementById('btnHistory').addEventListener('click', () => {
-                    this.renderFullHistory();
-                    this.openModal('history');
+                // Header buttons - use bind to preserve context
+                document.getElementById('btnHistory').addEventListener('click', function() {
+                    self.renderFullHistory();
+                    self.openModal('history');
                 });
 
-                document.getElementById('btnSettings').addEventListener('click', () => {
-                    document.getElementById('settingsCurrency').value = this.state.currency;
-                    this.openModal('settings');
+                document.getElementById('btnSettings').addEventListener('click', function() {
+                    document.getElementById('settingsCurrency').value = self.state.currency;
+                    self.openModal('settings');
                 });
 
-                document.getElementById('btnSearch').addEventListener('click', () => {
-                    this.openModal('search');
-                    setTimeout(() => document.getElementById('searchInput').focus(), 100);
+                document.getElementById('btnSearch').addEventListener('click', function() {
+                    self.openModal('search');
+                    setTimeout(function() { document.getElementById('searchInput').focus(); }, 100);
                 });
 
-                document.getElementById('btnReports').addEventListener('click', () => {
-                    this.openModal('reports');
-                    this.generateReport();
+                document.getElementById('btnReports').addEventListener('click', function() {
+                    self.openModal('reports');
+                    self.generateReport();
                 });
 
-                document.getElementById('btnTheme').addEventListener('click', () => {
-                    this.toggleTheme();
+                // THIS IS THE FIX - bind the method to preserve context
+                document.getElementById('btnTheme').addEventListener('click', function() {
+                    self.toggleTheme();
                 });
 
-                document.getElementById('btnViewAll').addEventListener('click', () => {
-                    this.renderFullHistory();
-                    this.openModal('history');
+                document.getElementById('btnViewAll').addEventListener('click', function() {
+                    self.renderFullHistory();
+                    self.openModal('history');
                 });
 
                 // Form inputs
-                document.getElementById('withdrawalSource').addEventListener('change', (e) => {
-                    this.updateWithdrawalPreview(e.target.value);
+                document.getElementById('withdrawalSource').addEventListener('change', function(e) {
+                    self.updateWithdrawalPreview(e.target.value);
                 });
                 
-                document.getElementById('withdrawalDate').addEventListener('change', () => {
+                document.getElementById('withdrawalDate').addEventListener('change', function() {
                     const source = document.getElementById('withdrawalSource').value;
-                    if (source) this.updateWithdrawalPreview(source);
+                    if (source) self.updateWithdrawalPreview(source);
                 });
 
-                document.getElementById('adjustmentAmount').addEventListener('input', (e) => {
-                    this.calculateAdjustment(e.target.value);
+                document.getElementById('adjustmentAmount').addEventListener('input', function(e) {
+                    self.calculateAdjustment(e.target.value);
                 });
             }
 
@@ -1669,16 +1708,16 @@
             }
 
             resetForm(type) {
-                const form = document.getElementById(`${type}Form`);
+                const form = document.getElementById(type + 'Form');
                 if (form) form.reset();
                 
-                document.getElementById(`${type}EditId`).value = '';
-                document.getElementById(`${type}ModalTitle`).textContent = 
+                document.getElementById(type + 'EditId').value = '';
+                document.getElementById(type + 'ModalTitle').textContent = 
                     type === 'withdrawal' ? 'Record Withdrawal' : 
                     type === 'expense' ? 'Record Expense' : 'Adjust Cash on Hand';
                 
-                const submitBtn = document.getElementById(`${type}SubmitBtn`);
-                const editActions = document.getElementById(`${type}EditActions`);
+                const submitBtn = document.getElementById(type + 'SubmitBtn');
+                const editActions = document.getElementById(type + 'EditActions');
                 
                 if (submitBtn) submitBtn.style.display = 'block';
                 if (editActions) editActions.style.display = 'none';
@@ -1688,18 +1727,18 @@
                 }
                 
                 const today = new Date().toISOString().split('T')[0];
-                const dateInput = document.getElementById(`${type}Date`);
+                const dateInput = document.getElementById(type + 'Date');
                 if (dateInput) dateInput.value = today;
             }
 
             editTransaction(type, id) {
                 let item;
                 if (type === 'withdrawal') {
-                    item = this.state.withdrawals.find(w => w.id === id);
+                    item = this.state.withdrawals.find(function(w) { return w.id === id; });
                 } else if (type === 'expense') {
-                    item = this.state.expenses.find(e => e.id === id);
+                    item = this.state.expenses.find(function(e) { return e.id === id; });
                 } else if (type === 'adjustment') {
-                    item = this.state.adjustments.find(a => a.id === id);
+                    item = this.state.adjustments.find(function(a) { return a.id === id; });
                 }
 
                 if (!item) {
@@ -1709,10 +1748,10 @@
 
                 this.openModal(type);
                 
-                document.getElementById(`${type}EditId`).value = id;
-                document.getElementById(`${type}ModalTitle`).textContent = `Edit ${type.charAt(0).toUpperCase() + type.slice(1)}`;
-                document.getElementById(`${type}SubmitBtn`).style.display = 'none';
-                document.getElementById(`${type}EditActions`).style.display = 'flex';
+                document.getElementById(type + 'EditId').value = id;
+                document.getElementById(type + 'ModalTitle').textContent = 'Edit ' + type.charAt(0).toUpperCase() + type.slice(1);
+                document.getElementById(type + 'SubmitBtn').style.display = 'none';
+                document.getElementById(type + 'EditActions').style.display = 'flex';
 
                 if (type === 'withdrawal') {
                     document.getElementById('withdrawalAmount').value = item.amount;
@@ -1739,15 +1778,15 @@
 
             showWithdrawalDetails(withdrawalId) {
                 this.currentEditingWithdrawal = withdrawalId;
-                const w = this.state.withdrawals.find(w => w.id === withdrawalId);
+                const w = this.state.withdrawals.find(function(w) { return w.id === withdrawalId; });
                 if (!w) return;
 
-                const expenses = this.state.expenses.filter(e => e.withdrawalId === withdrawalId)
-                    .sort((a, b) => new Date(b.date) - new Date(a.date));
+                const expenses = this.state.expenses.filter(function(e) { return e.withdrawalId === withdrawalId; })
+                    .sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
 
-                document.getElementById('withdrawalDetailsTitle').textContent = `Withdrawal ${withdrawalId}`;
+                document.getElementById('withdrawalDetailsTitle').textContent = 'Withdrawal ' + withdrawalId;
                 
-                const totalSpent = expenses.reduce((sum, e) => sum + e.amount, 0);
+                const totalSpent = expenses.reduce(function(sum, e) { return sum + e.amount; }, 0);
                 const progress = ((w.amount - w.remaining) / w.amount) * 100;
 
                 document.getElementById('withdrawalDetailsContent').innerHTML = `
@@ -1793,16 +1832,19 @@
                         </div>
                     `;
                 } else {
-                    document.getElementById('withdrawalExpensesList').innerHTML = expenses.map(e => `
-                        <div class="history-item" onclick="app.editExpenseFromDetails('${e.id}')">
-                            <div class="history-type expense">💸</div>
-                            <div class="history-details">
-                                <div class="history-title">${e.category}${e.note ? ` • ${e.note}` : ''}</div>
-                                <div class="history-meta">${this.formatDate(e.date)}</div>
+                    const self = this;
+                    document.getElementById('withdrawalExpensesList').innerHTML = expenses.map(function(e) {
+                        return `
+                            <div class="history-item" onclick="app.editExpenseFromDetails('${e.id}')">
+                                <div class="history-type expense">💸</div>
+                                <div class="history-details">
+                                    <div class="history-title">${e.category}${e.note ? ' • ' + e.note : ''}</div>
+                                    <div class="history-meta">${self.formatDate(e.date)}</div>
+                                </div>
+                                <div class="history-amount negative">-${self.formatMoney(e.amount)}</div>
                             </div>
-                            <div class="history-amount negative">-${this.formatMoney(e.amount)}</div>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                 }
 
                 this.openModal('withdrawalDetails');
@@ -1810,17 +1852,19 @@
 
             addExpenseToWithdrawal(withdrawalId) {
                 this.closeModal('withdrawalDetails');
-                setTimeout(() => {
-                    this.openModal('expense');
+                const self = this;
+                setTimeout(function() {
+                    self.openModal('expense');
                     document.getElementById('selectedWithdrawalId').value = withdrawalId;
-                    this.renderSourceSelector(withdrawalId);
+                    self.renderSourceSelector(withdrawalId);
                 }, 300);
             }
 
             editExpenseFromDetails(expenseId) {
                 this.closeModal('withdrawalDetails');
-                setTimeout(() => {
-                    this.editTransaction('expense', expenseId);
+                const self = this;
+                setTimeout(function() {
+                    self.editTransaction('expense', expenseId);
                 }, 300);
             }
 
@@ -1828,10 +1872,10 @@
                 if (!confirm('Are you sure you want to delete this transaction? This cannot be undone.')) return;
 
                 if (type === 'withdrawal') {
-                    const idx = this.state.withdrawals.findIndex(w => w.id === id);
+                    const idx = this.state.withdrawals.findIndex(function(w) { return w.id === id; });
                     if (idx > -1) {
                         const w = this.state.withdrawals[idx];
-                        const hasExpenses = this.state.expenses.some(e => e.withdrawalId === id);
+                        const hasExpenses = this.state.expenses.some(function(e) { return e.withdrawalId === id; });
                         if (hasExpenses) {
                             alert('Cannot delete withdrawal with linked expenses. Delete expenses first or reassign them.');
                             return;
@@ -1839,12 +1883,12 @@
                         this.state.withdrawals.splice(idx, 1);
                     }
                 } else if (type === 'expense') {
-                    const idx = this.state.expenses.findIndex(e => e.id === id);
+                    const idx = this.state.expenses.findIndex(function(e) { return e.id === id; });
                     if (idx > -1) {
                         this.state.expenses.splice(idx, 1);
                     }
                 } else if (type === 'adjustment') {
-                    const idx = this.state.adjustments.findIndex(a => a.id === id);
+                    const idx = this.state.adjustments.findIndex(function(a) { return a.id === id; });
                     if (idx > -1) {
                         this.state.adjustments.splice(idx, 1);
                     }
@@ -1865,7 +1909,7 @@
                 const ref = document.getElementById('withdrawalRef').value;
 
                 if (editId) {
-                    const w = this.state.withdrawals.find(w => w.id === editId);
+                    const w = this.state.withdrawals.find(function(w) { return w.id === editId; });
                     if (w) {
                         const diff = amount - w.amount;
                         w.amount = amount;
@@ -1876,9 +1920,9 @@
                     }
                 } else {
                     const formattedDate = date.replace(/-/g, '').slice(2);
-                    const existing = this.state.withdrawals.filter(w => w.id.startsWith(`${source}-${formattedDate}`)).length;
+                    const existing = this.state.withdrawals.filter(function(w) { return w.id.startsWith(source + '-' + formattedDate); }).length;
                     const sequence = String(existing + 1).padStart(3, '0');
-                    const controlNumber = `${source}-${formattedDate}-${sequence}`;
+                    const controlNumber = source + '-' + formattedDate + '-' + sequence;
 
                     const withdrawal = {
                         id: controlNumber,
@@ -1903,6 +1947,7 @@
 
             handleExpenseSubmit(e) {
                 e.preventDefault();
+                const self = this;
                 const editId = document.getElementById('expenseEditId').value;
                 const amount = parseFloat(document.getElementById('expenseAmount').value);
                 const withdrawalId = document.getElementById('selectedWithdrawalId').value;
@@ -1918,7 +1963,7 @@
                 const isCashOnHand = withdrawalId === 'CASH_ON_HAND';
                 
                 if (!isCashOnHand) {
-                    const withdrawal = this.state.withdrawals.find(w => w.id === withdrawalId);
+                    const withdrawal = this.state.withdrawals.find(function(w) { return w.id === withdrawalId; });
                     if (!withdrawal) {
                         alert('Selected withdrawal not found');
                         return;
@@ -1926,29 +1971,27 @@
                 }
 
                 if (editId) {
-                    const e = this.state.expenses.find(ex => ex.id === editId);
-                    if (e) {
-                        if (e.withdrawalId !== withdrawalId || e.amount !== amount) {
-                            if (e.withdrawalId === 'CASH_ON_HAND') {
-                                // Old source was cash on hand - no action needed, will recalculate
-                            } else {
-                                const oldW = this.state.withdrawals.find(w => w.id === e.withdrawalId);
+                    const exp = this.state.expenses.find(function(ex) { return ex.id === editId; });
+                    if (exp) {
+                        if (exp.withdrawalId !== withdrawalId || exp.amount !== amount) {
+                            if (exp.withdrawalId !== 'CASH_ON_HAND') {
+                                const oldW = this.state.withdrawals.find(function(w) { return w.id === exp.withdrawalId; });
                                 if (oldW) {
-                                    oldW.remaining += e.amount;
+                                    oldW.remaining += exp.amount;
                                     oldW.consumed = false;
                                 }
                             }
                             
                             if (withdrawalId === 'CASH_ON_HAND') {
                                 const currentCash = this.getCashOnHand();
-                                const oldCashImpact = e.withdrawalId === 'CASH_ON_HAND' ? e.amount : 0;
+                                const oldCashImpact = exp.withdrawalId === 'CASH_ON_HAND' ? exp.amount : 0;
                                 const availableCash = currentCash + oldCashImpact;
                                 if (availableCash < amount) {
                                     alert('Insufficient cash on hand');
                                     return;
                                 }
                             } else {
-                                const newW = this.state.withdrawals.find(w => w.id === withdrawalId);
+                                const newW = this.state.withdrawals.find(function(w) { return w.id === withdrawalId; });
                                 if (newW.remaining < amount) {
                                     alert('Insufficient balance in selected withdrawal');
                                     return;
@@ -1958,11 +2001,11 @@
                             }
                         }
                         
-                        e.amount = amount;
-                        e.category = category;
-                        e.note = note;
-                        e.date = date;
-                        e.withdrawalId = withdrawalId;
+                        exp.amount = amount;
+                        exp.category = category;
+                        exp.note = note;
+                        exp.date = date;
+                        exp.withdrawalId = withdrawalId;
                     }
                 } else {
                     if (isCashOnHand) {
@@ -1972,7 +2015,7 @@
                             return;
                         }
                     } else {
-                        const withdrawal = this.state.withdrawals.find(w => w.id === withdrawalId);
+                        const withdrawal = this.state.withdrawals.find(function(w) { return w.id === withdrawalId; });
                         if (withdrawal.remaining < amount) {
                             alert('Insufficient balance in selected withdrawal');
                             return;
@@ -1982,7 +2025,7 @@
                     }
 
                     const expense = {
-                        id: `EXP-${Date.now()}`,
+                        id: 'EXP-' + Date.now(),
                         type: 'expense',
                         amount: amount,
                         category: category,
@@ -2010,7 +2053,7 @@
                 const date = document.getElementById('adjustmentDate').value;
 
                 if (editId) {
-                    const a = this.state.adjustments.find(adj => adj.id === editId);
+                    const a = this.state.adjustments.find(function(adj) { return adj.id === editId; });
                     if (a) {
                         a.newBalance = actualAmount;
                         a.reason = reason;
@@ -2024,7 +2067,7 @@
                     const difference = actualAmount - previousBalance;
 
                     const adjustment = {
-                        id: `ADJ-${Date.now()}`,
+                        id: 'ADJ-' + Date.now(),
                         type: 'adjustment',
                         previousBalance: previousBalance,
                         newBalance: actualAmount,
@@ -2044,7 +2087,7 @@
                 this.showNotification(editId ? 'Adjustment updated' : 'Cash adjusted');
             }
 
-            renderSourceSelector(selectedId = null) {
+            renderSourceSelector(selectedId) {
                 const container = document.getElementById('expenseSourceSelector');
                 const currentCash = this.getCashOnHand();
                 
@@ -2060,9 +2103,9 @@
                 });
                 
                 this.state.withdrawals
-                    .filter(w => w.remaining > 0 || w.id === selectedId)
-                    .sort((a, b) => new Date(b.date) - new Date(a.date))
-                    .forEach(w => {
+                    .filter(function(w) { return w.remaining > 0 || w.id === selectedId; })
+                    .sort(function(a, b) { return new Date(b.date) - new Date(a.date); })
+                    .forEach(function(w) {
                         options.push({
                             id: w.id,
                             displayId: w.id,
@@ -2091,20 +2134,31 @@
                 const submitBtn = document.getElementById('expenseSubmitBtn');
                 if (submitBtn) submitBtn.disabled = false;
 
-                container.innerHTML = options.map(opt => `
-                    <div class="source-option ${opt.isCash ? 'cash-option' : ''} ${selectedId === opt.id ? 'selected' : ''} ${opt.disabled ? 'disabled' : ''}" 
-                         ${opt.disabled ? '' : `onclick="app.selectWithdrawalSource('${opt.id}', this)"`}
-                         style="${opt.disabled ? 'opacity: 0.5; cursor: not-allowed;' : ''}">
-                        <div class="source-info">
-                            <div class="source-id">${opt.displayId}</div>
-                            <div class="source-balance">
-                                ${opt.isCash ? 'Available: ' : 'Remaining: '}${this.formatMoney(opt.balance)} 
-                                ${opt.isCash ? '' : ' • ' + opt.source}
+                const self = this;
+                container.innerHTML = options.map(function(opt) {
+                    const isSelected = selectedId === opt.id;
+                    const isDisabled = opt.disabled;
+                    const cashClass = opt.isCash ? 'cash-option' : '';
+                    const selectedClass = isSelected ? 'selected' : '';
+                    const disabledClass = isDisabled ? 'disabled' : '';
+                    const style = isDisabled ? 'opacity: 0.5; cursor: not-allowed;' : '';
+                    const onclick = isDisabled ? '' : 'onclick="app.selectWithdrawalSource(\'' + opt.id + '\', this)"';
+                    
+                    return `
+                        <div class="source-option ${cashClass} ${selectedClass} ${disabledClass}" 
+                             ${onclick}
+                             style="${style}">
+                            <div class="source-info">
+                                <div class="source-id">${opt.displayId}</div>
+                                <div class="source-balance">
+                                    ${opt.isCash ? 'Available: ' : 'Remaining: '}${self.formatMoney(opt.balance)} 
+                                    ${opt.isCash ? '' : ' • ' + opt.source}
+                                </div>
                             </div>
+                            <div class="source-radio"></div>
                         </div>
-                        <div class="source-radio"></div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
                 
                 if (selectedId) {
                     document.getElementById('selectedWithdrawalId').value = selectedId;
@@ -2112,7 +2166,7 @@
             }
 
             selectWithdrawalSource(id, element) {
-                document.querySelectorAll('.source-option').forEach(el => el.classList.remove('selected'));
+                document.querySelectorAll('.source-option').forEach(function(el) { el.classList.remove('selected'); });
                 element.classList.add('selected');
                 document.getElementById('selectedWithdrawalId').value = id;
             }
@@ -2121,9 +2175,9 @@
                 if (!source) return;
                 const date = document.getElementById('withdrawalDate').value || new Date().toISOString().split('T')[0];
                 const formattedDate = date.replace(/-/g, '').slice(2);
-                const existing = this.state.withdrawals.filter(w => w.id.startsWith(`${source}-${formattedDate}`)).length;
+                const existing = this.state.withdrawals.filter(function(w) { return w.id.startsWith(source + '-' + formattedDate); }).length;
                 const sequence = String(existing + 1).padStart(3, '0');
-                const previewId = `${source}-${formattedDate}-${sequence}`;
+                const previewId = source + '-' + formattedDate + '-' + sequence;
                 
                 const hint = document.getElementById('previewId');
                 if (hint) hint.textContent = previewId;
@@ -2133,7 +2187,7 @@
                 const currentCash = this.getCashOnHand();
                 const balanceEl = document.getElementById('currentRecordedBalance');
                 if (balanceEl) {
-                    balanceEl.textContent = `${CurrencySymbols[this.state.currency]}${currentCash.toFixed(2)}`;
+                    balanceEl.textContent = CurrencySymbols[this.state.currency] + currentCash.toFixed(2);
                 }
                 const preview = document.getElementById('adjustmentPreview');
                 if (preview) preview.classList.add('hidden');
@@ -2158,13 +2212,13 @@
                 const symbol = CurrencySymbols[this.state.currency];
                 
                 if (diff > 0) {
-                    value.textContent = `+${symbol}${diff.toFixed(2)} (Cash increased)`;
+                    value.textContent = '+' + symbol + diff.toFixed(2) + ' (Cash increased)';
                     value.style.color = 'var(--accent-success)';
                 } else if (diff < 0) {
-                    value.textContent = `${symbol}${diff.toFixed(2)} (Cash decreased)`;
+                    value.textContent = symbol + diff.toFixed(2) + ' (Cash decreased)';
                     value.style.color = 'var(--accent-danger)';
                 } else {
-                    value.textContent = `No adjustment needed`;
+                    value.textContent = 'No adjustment needed';
                     value.style.color = 'var(--text-secondary)';
                 }
             }
@@ -2183,34 +2237,35 @@
 
                 const q = query.toLowerCase();
                 const results = [];
+                const self = this;
 
-                this.state.withdrawals.forEach(w => {
+                this.state.withdrawals.forEach(function(w) {
                     if (w.id.toLowerCase().includes(q) || 
                         w.source.toLowerCase().includes(q) ||
                         w.amount.toString().includes(q) ||
                         (w.reference && w.reference.toLowerCase().includes(q))) {
-                        results.push({...w, displayType: 'withdrawal'});
+                        results.push(Object.assign({}, w, {displayType: 'withdrawal'}));
                     }
                 });
 
-                this.state.expenses.forEach(e => {
+                this.state.expenses.forEach(function(e) {
                     if (e.category.toLowerCase().includes(q) || 
                         (e.note && e.note.toLowerCase().includes(q)) ||
                         e.amount.toString().includes(q) ||
                         e.withdrawalId.toLowerCase().includes(q)) {
-                        results.push({...e, displayType: 'expense'});
+                        results.push(Object.assign({}, e, {displayType: 'expense'}));
                     }
                 });
 
-                this.state.adjustments.forEach(a => {
+                this.state.adjustments.forEach(function(a) {
                     if (a.reason.toLowerCase().includes(q) || 
                         (a.note && a.note.toLowerCase().includes(q)) ||
                         a.difference.toString().includes(q)) {
-                        results.push({...a, displayType: 'adjustment'});
+                        results.push(Object.assign({}, a, {displayType: 'adjustment'}));
                     }
                 });
 
-                results.sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date));
+                results.sort(function(a, b) { return new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date); });
 
                 if (results.length === 0) {
                     container.innerHTML = `
@@ -2222,7 +2277,7 @@
                     return;
                 }
 
-                container.innerHTML = results.map(t => this.renderSearchResult(t)).join('');
+                container.innerHTML = results.map(function(t) { return self.renderSearchResult(t); }).join('');
             }
 
             renderSearchResult(t) {
@@ -2233,21 +2288,21 @@
                 
                 if (isWithdrawal) {
                     icon = '⬇️';
-                    title = `${t.source} Withdrawal`;
-                    meta = `${t.id} • ${this.formatDate(t.date)}`;
-                    amount = `+${this.formatMoney(t.amount)}`;
+                    title = t.source + ' Withdrawal';
+                    meta = t.id + ' • ' + this.formatDate(t.date);
+                    amount = '+' + this.formatMoney(t.amount);
                     amountClass = 'positive';
                 } else if (isExpense) {
                     icon = '💸';
                     title = t.category;
-                    meta = `${t.note || 'No note'} • From: ${t.withdrawalId} • ${this.formatDate(t.date)}`;
-                    amount = `-${this.formatMoney(t.amount)}`;
+                    meta = (t.note || 'No note') + ' • From: ' + t.withdrawalId + ' • ' + this.formatDate(t.date);
+                    amount = '-' + this.formatMoney(t.amount);
                     amountClass = 'negative';
                 } else {
                     icon = t.difference > 0 ? '⬆️' : '⬇️';
-                    title = `Adjustment: ${t.reason}`;
-                    meta = `${t.note || ''} • ${this.formatDate(t.date)}`;
-                    amount = `${t.difference > 0 ? '+' : ''}${this.formatMoney(t.difference)}`;
+                    title = 'Adjustment: ' + t.reason;
+                    meta = (t.note || '') + ' • ' + this.formatDate(t.date);
+                    amount = (t.difference > 0 ? '+' : '') + this.formatMoney(t.difference);
                     amountClass = t.difference > 0 ? 'positive' : 'negative';
                 }
 
@@ -2266,7 +2321,7 @@
             setReportRange(range) {
                 this.currentReportRange = range;
                 
-                document.querySelectorAll('.filter-btn').forEach(btn => {
+                document.querySelectorAll('.filter-btn').forEach(function(btn) {
                     btn.classList.remove('active');
                 });
                 
@@ -2310,24 +2365,24 @@
                         break;
                 }
 
-                const filteredExpenses = this.state.expenses.filter(e => {
+                const filteredExpenses = this.state.expenses.filter(function(e) {
                     const d = new Date(e.date);
                     return d >= startDate && d <= endDate;
                 });
 
-                const totalSpent = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
+                const totalSpent = filteredExpenses.reduce(function(sum, e) { return sum + e.amount; }, 0);
                 const transactionCount = filteredExpenses.length;
                 
                 const daysDiff = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
                 const dailyAvg = totalSpent / daysDiff;
 
                 const categoryTotals = {};
-                filteredExpenses.forEach(e => {
+                filteredExpenses.forEach(function(e) {
                     categoryTotals[e.category] = (categoryTotals[e.category] || 0) + e.amount;
                 });
 
-                const topCategory = Object.entries(categoryTotals)
-                    .sort((a, b) => b[1] - a[1])[0];
+                const sortedCategories = Object.entries(categoryTotals).sort(function(a, b) { return b[1] - a[1]; });
+                const topCategory = sortedCategories[0];
 
                 document.getElementById('reportTotalSpent').textContent = this.formatMoney(totalSpent);
                 document.getElementById('reportTransactionCount').textContent = transactionCount;
@@ -2353,6 +2408,7 @@
                 ];
 
                 const isDark = this.state.theme === 'dark';
+                const self = this;
                 
                 this.chartInstance = new Chart(ctx, {
                     type: 'doughnut',
@@ -2384,11 +2440,11 @@
                                 borderColor: isDark ? '#475569' : '#cbd5e1',
                                 borderWidth: 1,
                                 callbacks: {
-                                    label: (context) => {
+                                    label: function(context) {
                                         const val = context.parsed;
-                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const total = context.dataset.data.reduce(function(a, b) { return a + b; }, 0);
                                         const pct = ((val / total) * 100).toFixed(1);
-                                        return `${context.label}: ${this.formatMoney(val)} (${pct}%)`;
+                                        return context.label + ': ' + self.formatMoney(val) + ' (' + pct + '%)';
                                     }
                                 }
                             }
@@ -2399,9 +2455,12 @@
 
             renderCategoryBreakdown(categoryTotals, total) {
                 const container = document.getElementById('categoryBreakdown');
-                const sorted = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
+                const sorted = Object.entries(categoryTotals).sort(function(a, b) { return b[1] - a[1]; });
+                const self = this;
                 
-                container.innerHTML = sorted.map(([cat, amount]) => {
+                container.innerHTML = sorted.map(function(item) {
+                    const cat = item[0];
+                    const amount = item[1];
                     const pct = ((amount / total) * 100).toFixed(1);
                     return `
                         <div class="history-item" style="margin-bottom: var(--spacing-sm);">
@@ -2409,7 +2468,7 @@
                                 <div class="history-title">${cat}</div>
                                 <div class="history-meta">${pct}% of total spending</div>
                             </div>
-                            <div class="history-amount negative">${this.formatMoney(amount)}</div>
+                            <div class="history-amount negative">${self.formatMoney(amount)}</div>
                         </div>
                     `;
                 }).join('');
@@ -2426,29 +2485,30 @@
                 document.getElementById('cashAmount').textContent = cashOnHand.toFixed(2);
                 document.getElementById('currencyDisplay').textContent = this.state.currency;
                 
-                const active = this.state.withdrawals.filter(w => !w.consumed).length;
+                const active = this.state.withdrawals.filter(function(w) { return !w.consumed; }).length;
                 document.getElementById('activeWithdrawals').textContent = 
-                    `${active} active withdrawal${active !== 1 ? 's' : ''}`;
+                    active + ' active withdrawal' + (active !== 1 ? 's' : '');
                 
                 const sevenDaysAgo = new Date();
                 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
                 
-                const recentExpenses = this.state.expenses.filter(e => new Date(e.date) >= sevenDaysAgo);
-                const totalSpent = recentExpenses.reduce((sum, e) => sum + e.amount, 0);
+                const recentExpenses = this.state.expenses.filter(function(e) { return new Date(e.date) >= sevenDaysAgo; });
+                const totalSpent = recentExpenses.reduce(function(sum, e) { return sum + e.amount; }, 0);
                 
                 const trendEl = document.getElementById('trendIndicator');
                 if (totalSpent > 0) {
-                    trendEl.innerHTML = `<span>📉</span><span>${this.formatMoney(totalSpent)} spent (7d)</span>`;
+                    trendEl.innerHTML = '<span>📉</span><span>' + this.formatMoney(totalSpent) + ' spent (7d)</span>';
                     trendEl.className = 'meta-item negative';
                 } else {
-                    trendEl.innerHTML = `<span>✓</span><span>No recent expenses</span>`;
+                    trendEl.innerHTML = '<span>✓</span><span>No recent expenses</span>';
                     trendEl.className = 'meta-item positive';
                 }
             }
 
             renderWithdrawals() {
                 const container = document.getElementById('withdrawalsContainer');
-                const activeWithdrawals = this.state.withdrawals.filter(w => !w.consumed);
+                const activeWithdrawals = this.state.withdrawals.filter(function(w) { return !w.consumed; });
+                const self = this;
                 
                 if (activeWithdrawals.length === 0) {
                     container.innerHTML = `
@@ -2463,8 +2523,8 @@
                     return;
                 }
                 
-                container.innerHTML = activeWithdrawals.map(w => {
-                    const linkedExpenses = this.state.expenses.filter(e => e.withdrawalId === w.id);
+                container.innerHTML = activeWithdrawals.map(function(w) {
+                    const linkedExpenses = self.state.expenses.filter(function(e) { return e.withdrawalId === w.id; });
                     const progress = ((w.amount - w.remaining) / w.amount) * 100;
                     
                     return `
@@ -2474,13 +2534,13 @@
                                     <div class="withdrawal-id">${w.id}</div>
                                     <div class="withdrawal-source">
                                         <span>🏦</span>
-                                        <span>${w.source} • ${this.formatDate(w.date)}</span>
+                                        <span>${w.source} • ${self.formatDate(w.date)}</span>
                                     </div>
                                 </div>
                                 <div class="withdrawal-amounts">
-                                    <div class="withdrawal-total">${this.formatMoney(w.amount)}</div>
+                                    <div class="withdrawal-total">${self.formatMoney(w.amount)}</div>
                                     <div class="withdrawal-remaining ${w.consumed ? 'depleted' : ''}">
-                                        ${this.formatMoney(w.remaining)} left
+                                        ${self.formatMoney(w.remaining)} left
                                     </div>
                                 </div>
                             </div>
@@ -2500,10 +2560,12 @@
             renderRecentActivity() {
                 const container = document.getElementById('recentActivityContainer');
                 const allTransactions = [
-                    ...this.state.withdrawals.map(w => ({...w, displayType: 'withdrawal'})),
-                    ...this.state.expenses.map(e => ({...e, displayType: 'expense'})),
-                    ...this.state.adjustments.map(a => ({...a, displayType: 'adjustment'}))
-                ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+                    ...this.state.withdrawals.map(function(w) { return Object.assign({}, w, {displayType: 'withdrawal'}); }),
+                    ...this.state.expenses.map(function(e) { return Object.assign({}, e, {displayType: 'expense'}); }),
+                    ...this.state.adjustments.map(function(a) { return Object.assign({}, a, {displayType: 'adjustment'}); })
+                ].sort(function(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); }).slice(0, 5);
+                
+                const self = this;
                 
                 if (allTransactions.length === 0) {
                     container.innerHTML = `
@@ -2515,7 +2577,7 @@
                     return;
                 }
                 
-                container.innerHTML = allTransactions.map(t => {
+                container.innerHTML = allTransactions.map(function(t) {
                     const isWithdrawal = t.displayType === 'withdrawal';
                     const isExpense = t.displayType === 'expense';
                     
@@ -2523,21 +2585,21 @@
                     
                     if (isWithdrawal) {
                         icon = '⬇️';
-                        title = `Withdrawal from ${t.source}`;
+                        title = 'Withdrawal from ' + t.source;
                         meta = t.id;
-                        amount = `+${this.formatMoney(t.amount)}`;
+                        amount = '+' + self.formatMoney(t.amount);
                         amountClass = 'positive';
                     } else if (isExpense) {
                         icon = '💸';
-                        title = `${t.category}`;
-                        meta = `From ${t.withdrawalId} • ${this.formatDate(t.date)}`;
-                        amount = `-${this.formatMoney(t.amount)}`;
+                        title = t.category;
+                        meta = 'From ' + t.withdrawalId + ' • ' + self.formatDate(t.date);
+                        amount = '-' + self.formatMoney(t.amount);
                         amountClass = 'negative';
                     } else {
                         icon = t.difference > 0 ? '⬆️' : '⬇️';
-                        title = `Cash Adjustment`;
+                        title = 'Cash Adjustment';
                         meta = t.reason;
-                        amount = `${t.difference > 0 ? '+' : ''}${this.formatMoney(t.difference)}`;
+                        amount = (t.difference > 0 ? '+' : '') + self.formatMoney(t.difference);
                         amountClass = t.difference > 0 ? 'positive' : 'negative';
                     }
                     
@@ -2563,72 +2625,78 @@
                 }
                 
                 const allTransactions = [
-                    ...this.state.withdrawals.map(w => ({...w, displayType: 'withdrawal'})),
-                    ...this.state.expenses.map(e => ({...e, displayType: 'expense'})),
-                    ...this.state.adjustments.map(a => ({...a, displayType: 'adjustment'}))
-                ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                    ...this.state.withdrawals.map(function(w) { return Object.assign({}, w, {displayType: 'withdrawal'}); }),
+                    ...this.state.expenses.map(function(e) { return Object.assign({}, e, {displayType: 'expense'}); }),
+                    ...this.state.adjustments.map(function(a) { return Object.assign({}, a, {displayType: 'adjustment'}); })
+                ].sort(function(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
                 
                 if (allTransactions.length === 0) {
                     container.innerHTML = '<div class="empty-state">No transaction history</div>';
                     return;
                 }
                 
-                const grouped = allTransactions.reduce((acc, t) => {
+                const grouped = allTransactions.reduce(function(acc, t) {
                     const date = t.date;
                     if (!acc[date]) acc[date] = [];
                     acc[date].push(t);
                     return acc;
                 }, {});
                 
-                container.innerHTML = Object.entries(grouped).map(([date, transactions]) => `
-                    <div style="margin-bottom: var(--spacing-lg);">
-                        <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--spacing-sm); padding-left: var(--spacing-sm);">
-                            ${this.formatDateLong(date)}
-                        </div>
-                        ${transactions.map(t => {
-                            const isWithdrawal = t.displayType === 'withdrawal';
-                            const isExpense = t.displayType === 'expense';
-                            
-                            let icon, title, subtitle, amount, amountClass;
-                            
-                            if (isWithdrawal) {
-                                icon = '⬇️';
-                                title = `Withdrawal • ${t.source}`;
-                                subtitle = t.id;
-                                amount = `+${this.formatMoney(t.amount)}`;
-                                amountClass = 'positive';
-                            } else if (isExpense) {
-                                icon = '💸';
-                                title = `${t.category}${t.note ? ` • ${t.note}` : ''}`;
-                                subtitle = `From: ${t.withdrawalId}`;
-                                amount = `-${this.formatMoney(t.amount)}`;
-                                amountClass = 'negative';
-                            } else {
-                                icon = t.difference > 0 ? '⬆️' : '⬇️';
-                                title = `Adjustment • ${t.reason}`;
-                                subtitle = `Recorded: ${this.formatMoney(t.previousBalance)} → ${this.formatMoney(t.newBalance)}`;
-                                amount = `${t.difference > 0 ? '+' : ''}${this.formatMoney(t.difference)}`;
-                                amountClass = t.difference > 0 ? 'positive' : 'negative';
-                            }
-                            
-                            return `
-                                <div class="history-item" style="margin-bottom: var(--spacing-sm);" onclick="app.editTransaction('${t.displayType}', '${t.id}')">
-                                    <div class="history-type ${t.displayType}">${icon}</div>
-                                    <div class="history-details">
-                                        <div class="history-title">${title}</div>
-                                        <div class="history-meta">${subtitle}</div>
+                const self = this;
+                container.innerHTML = Object.entries(grouped).map(function(group) {
+                    const date = group[0];
+                    const transactions = group[1];
+                    
+                    return `
+                        <div style="margin-bottom: var(--spacing-lg);">
+                            <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--spacing-sm); padding-left: var(--spacing-sm);">
+                                ${self.formatDateLong(date)}
+                            </div>
+                            ${transactions.map(function(t) {
+                                const isWithdrawal = t.displayType === 'withdrawal';
+                                const isExpense = t.displayType === 'expense';
+                                
+                                let icon, title, subtitle, amount, amountClass;
+                                
+                                if (isWithdrawal) {
+                                    icon = '⬇️';
+                                    title = 'Withdrawal • ' + t.source;
+                                    subtitle = t.id;
+                                    amount = '+' + self.formatMoney(t.amount);
+                                    amountClass = 'positive';
+                                } else if (isExpense) {
+                                    icon = '💸';
+                                    title = t.category + (t.note ? ' • ' + t.note : '');
+                                    subtitle = 'From: ' + t.withdrawalId;
+                                    amount = '-' + self.formatMoney(t.amount);
+                                    amountClass = 'negative';
+                                } else {
+                                    icon = t.difference > 0 ? '⬆️' : '⬇️';
+                                    title = 'Adjustment • ' + t.reason;
+                                    subtitle = 'Recorded: ' + self.formatMoney(t.previousBalance) + ' → ' + self.formatMoney(t.newBalance);
+                                    amount = (t.difference > 0 ? '+' : '') + self.formatMoney(t.difference);
+                                    amountClass = t.difference > 0 ? 'positive' : 'negative';
+                                }
+                                
+                                return `
+                                    <div class="history-item" style="margin-bottom: var(--spacing-sm);" onclick="app.editTransaction('${t.displayType}', '${t.id}')">
+                                        <div class="history-type ${t.displayType}">${icon}</div>
+                                        <div class="history-details">
+                                            <div class="history-title">${title}</div>
+                                            <div class="history-meta">${subtitle}</div>
+                                        </div>
+                                        <div class="history-amount ${amountClass}">${amount}</div>
                                     </div>
-                                    <div class="history-amount ${amountClass}">${amount}</div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                `).join('');
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                }).join('');
             }
 
             formatMoney(amount) {
                 const symbol = CurrencySymbols[this.state.currency];
-                return `${symbol}${Math.abs(amount).toFixed(2)}`;
+                return symbol + Math.abs(amount).toFixed(2);
             }
 
             formatDate(dateStr) {
@@ -2666,7 +2734,7 @@
                 this.saveState();
                 this.render();
                 if (this.chartInstance) this.generateReport();
-                this.showNotification(`Currency changed to ${currency}`);
+                this.showNotification('Currency changed to ' + currency);
             }
 
             exportData() {
@@ -2675,7 +2743,7 @@
                 const url = URL.createObjectURL(dataBlob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = `cashtrail-backup-${new Date().toISOString().split('T')[0]}.json`;
+                link.download = 'cashtrail-backup-' + new Date().toISOString().split('T')[0] + '.json';
                 link.click();
                 URL.revokeObjectURL(url);
                 this.showNotification('Data exported successfully');
@@ -2690,7 +2758,8 @@
                 if (!file) return;
                 
                 const reader = new FileReader();
-                reader.onload = (e) => {
+                const self = this;
+                reader.onload = function(e) {
                     try {
                         const imported = JSON.parse(e.target.result);
                         
@@ -2699,7 +2768,7 @@
                         }
                         
                         if (confirm('This will replace all current data. Continue?')) {
-                            this.state = { 
+                            self.state = { 
                                 currency: imported.currency || 'PHP',
                                 initialCashOnHand: imported.initialCashOnHand || 0,
                                 withdrawals: imported.withdrawals || [],
@@ -2708,10 +2777,10 @@
                                 sequenceCounter: imported.sequenceCounter || {},
                                 theme: imported.theme || 'dark'
                             };
-                            this.applyTheme();
-                            this.saveState();
-                            this.render();
-                            this.showNotification('Data imported successfully');
+                            self.applyTheme();
+                            self.saveState();
+                            self.render();
+                            self.showNotification('Data imported successfully');
                         }
                     } catch (err) {
                         alert('Failed to import: ' + err.message);
@@ -2744,7 +2813,7 @@
 
         // Initialize app
         let app;
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() {
             app = new CashTrailApp();
         });
     </script>

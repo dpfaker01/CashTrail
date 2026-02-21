@@ -1,7 +1,7 @@
 {
-  "name": "CashTrail - Withdrawal to Expense Tracker",
+  "name": "Withdrawal to Expense Tracker",
   "short_name": "CashTrail",
-  "description": "Track every penny from bank to spend. A precise withdrawal-to-expense ledger for managing your cash flow.",
+  "description": "Withdrawal-to-Expense Ledger - Track every penny from bank to spend",
   "start_url": "/CashTrail/",
   "display": "standalone",
   "background_color": "#0f172a",
@@ -32,3 +32,4 @@
     }
   ]
 }
+

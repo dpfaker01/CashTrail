@@ -10,9 +10,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="CashTrail">
     <title>CashTrail - Withdrawal to Expense Tracker</title>
-    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <style>
         :root {
             --bg-primary: #0f172a;
@@ -35,7 +33,6 @@
             --spacing-lg: 1.5rem;
             --spacing-xl: 2rem;
         }
-
         [data-theme="light"] {
             --bg-primary: #f1f5f9;
             --bg-secondary: #ffffff;
@@ -45,7 +42,6 @@
             --border-subtle: #cbd5e1;
             --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
-
         * {
             margin: 0;
             padding: 0;
@@ -53,7 +49,6 @@
             -webkit-tap-highlight-color: transparent;
             touch-action: manipulation;
         }
-
         html {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             font-size: 16px;
@@ -62,7 +57,6 @@
             height: 100%;
             transition: background 0.3s, color 0.3s;
         }
-
         body {
             height: 100%;
             display: flex;
@@ -73,7 +67,6 @@
             -webkit-user-select: none;
             user-select: none;
         }
-
         #app {
             display: flex;
             flex-direction: column;
@@ -86,7 +79,6 @@
             transition: background 0.3s;
             overflow: hidden;
         }
-
         .app-header {
             position: sticky;
             top: 0;
@@ -100,11 +92,9 @@
             align-items: center;
             flex-shrink: 0;
         }
-
         [data-theme="light"] .app-header {
             background: rgba(241, 245, 249, 0.95);
         }
-
         .brand {
             font-size: 1.25rem;
             font-weight: 700;
@@ -113,12 +103,10 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
         .header-actions {
             display: flex;
             gap: var(--spacing-sm);
         }
-
         .icon-btn {
             width: 40px;
             height: 40px;
@@ -136,18 +124,15 @@
             -webkit-user-select: none;
             user-select: none;
         }
-
         .icon-btn:hover {
             background: var(--bg-tertiary);
             color: var(--text-primary);
         }
-
         .icon-btn.active {
             background: var(--accent-primary);
             color: white;
             border-color: var(--accent-primary);
         }
-
         .main-content {
             flex: 1;
             overflow-y: auto;
@@ -157,7 +142,6 @@
             -webkit-overflow-scrolling: touch;
             overscroll-behavior-y: contain;
         }
-
         .cash-hero {
             background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
             border-radius: var(--radius-lg);
@@ -167,7 +151,6 @@
             position: relative;
             overflow: hidden;
         }
-
         .cash-hero::before {
             content: '';
             position: absolute;
@@ -178,12 +161,10 @@
             background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
             animation: pulse 4s ease-in-out infinite;
         }
-
         @keyframes pulse {
             0%, 100% { transform: scale(1); opacity: 0.5; }
             50% { transform: scale(1.1); opacity: 0.8; }
         }
-
         .cash-label {
             font-size: 0.875rem;
             color: var(--text-secondary);
@@ -193,7 +174,6 @@
             position: relative;
             z-index: 1;
         }
-
         .cash-amount {
             font-size: 2.5rem;
             font-weight: 700;
@@ -202,13 +182,11 @@
             z-index: 1;
             font-variant-numeric: tabular-nums;
         }
-
         .cash-currency {
             font-size: 1rem;
             color: var(--accent-primary);
             margin-left: var(--spacing-xs);
         }
-
         .cash-meta {
             display: flex;
             gap: var(--spacing-md);
@@ -217,7 +195,6 @@
             z-index: 1;
             flex-wrap: wrap;
         }
-
         .meta-item {
             display: flex;
             align-items: center;
@@ -225,10 +202,8 @@
             font-size: 0.875rem;
             color: var(--text-secondary);
         }
-
         .meta-item.positive { color: var(--accent-success); }
         .meta-item.negative { color: var(--accent-danger); }
-
         .section-header {
             display: flex;
             justify-content: space-between;
@@ -236,13 +211,11 @@
             margin-bottom: var(--spacing-md);
             margin-top: var(--spacing-lg);
         }
-
         .section-title {
             font-size: 1.125rem;
             font-weight: 600;
             color: var(--text-primary);
         }
-
         .section-action {
             font-size: 0.875rem;
             color: var(--accent-primary);
@@ -251,13 +224,11 @@
             cursor: pointer;
             font-weight: 500;
         }
-
         .withdrawal-list {
             display: flex;
             flex-direction: column;
             gap: var(--spacing-md);
         }
-
         .withdrawal-card {
             background: var(--bg-secondary);
             border-radius: var(--radius-md);
@@ -265,16 +236,16 @@
             overflow: hidden;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-
         .withdrawal-card:active {
             transform: scale(0.98);
         }
-
         .withdrawal-card.consumed {
             opacity: 0.6;
             border-color: var(--bg-tertiary);
         }
-
+        .withdrawal-card.initial-cash {
+            border-left: 4px solid var(--accent-warning);
+        }
         .withdrawal-header {
             padding: var(--spacing-md);
             display: flex;
@@ -283,11 +254,9 @@
             cursor: pointer;
             transition: background 0.2s;
         }
-
         .withdrawal-header:hover {
             background: rgba(59, 130, 246, 0.05);
         }
-
         .withdrawal-id {
             font-family: 'Courier New', monospace;
             font-size: 0.75rem;
@@ -298,7 +267,10 @@
             margin-bottom: var(--spacing-xs);
             display: inline-block;
         }
-
+        .withdrawal-id.initial-cash-id {
+            color: var(--accent-warning);
+            background: rgba(245, 158, 11, 0.1);
+        }
         .withdrawal-source {
             font-size: 0.875rem;
             color: var(--text-secondary);
@@ -306,35 +278,29 @@
             align-items: center;
             gap: var(--spacing-xs);
         }
-
         .withdrawal-amounts {
             text-align: right;
         }
-
         .withdrawal-total {
             font-size: 1.25rem;
             font-weight: 600;
             color: var(--text-primary);
             font-variant-numeric: tabular-nums;
         }
-
         .withdrawal-remaining {
             font-size: 0.875rem;
             color: var(--accent-success);
             font-weight: 500;
         }
-
         .withdrawal-remaining.depleted {
             color: var(--text-secondary);
             text-decoration: line-through;
         }
-
         .withdrawal-actions {
             display: flex;
             gap: var(--spacing-sm);
             padding: 0 var(--spacing-md) var(--spacing-md);
         }
-
         .btn-small {
             padding: var(--spacing-xs) var(--spacing-sm);
             border-radius: var(--radius-sm);
@@ -348,87 +314,21 @@
             align-items: center;
             gap: 0.25rem;
         }
-
         .btn-small:hover {
             background: var(--accent-primary);
             color: white;
             border-color: var(--accent-primary);
         }
-
-        .expense-list {
-            padding: var(--spacing-md);
-            background: rgba(0, 0, 0, 0.2);
-            border-top: 1px solid var(--border-subtle);
-        }
-
-        [data-theme="light"] .expense-list {
-            background: rgba(0, 0, 0, 0.05);
-        }
-
-        .expense-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: var(--spacing-sm) 0;
-            border-bottom: 1px solid var(--border-subtle);
-            cursor: pointer;
-            transition: background 0.2s;
-            border-radius: var(--radius-sm);
-        }
-
-        .expense-item:hover {
-            background: rgba(59, 130, 246, 0.1);
-            margin: 0 -var(--spacing-sm);
-            padding-left: var(--spacing-sm);
-            padding-right: var(--spacing-sm);
-        }
-
-        .expense-item:last-child {
-            border-bottom: none;
-        }
-
-        .expense-info {
-            flex: 1;
-        }
-
-        .expense-category {
-            font-size: 0.75rem;
-            color: var(--accent-warning);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.125rem;
-        }
-
-        .expense-note {
-            font-size: 0.875rem;
-            color: var(--text-primary);
-        }
-
-        .expense-meta {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-top: 0.125rem;
-        }
-
-        .expense-amount {
-            font-weight: 600;
-            color: var(--accent-danger);
-            font-variant-numeric: tabular-nums;
-            margin-left: var(--spacing-sm);
-        }
-
         .empty-state {
             text-align: center;
             padding: var(--spacing-xl);
             color: var(--text-secondary);
         }
-
         .empty-icon {
             font-size: 3rem;
             margin-bottom: var(--spacing-md);
             opacity: 0.5;
         }
-
         .fab-container {
             position: fixed;
             bottom: var(--spacing-lg);
@@ -439,7 +339,6 @@
             gap: var(--spacing-sm);
             align-items: flex-end;
         }
-
         .fab {
             width: 56px;
             height: 56px;
@@ -455,22 +354,18 @@
             justify-content: center;
             transition: transform 0.2s;
         }
-
         .fab:active {
             transform: scale(0.9);
         }
-
         .fab-menu {
             display: none;
             flex-direction: column;
             gap: var(--spacing-sm);
             margin-bottom: var(--spacing-sm);
         }
-
         .fab-menu.open {
             display: flex;
         }
-
         .fab-option {
             display: flex;
             align-items: center;
@@ -485,7 +380,6 @@
             white-space: nowrap;
             box-shadow: var(--shadow-lg);
         }
-
         .fab-option-icon {
             width: 32px;
             height: 32px;
@@ -495,11 +389,9 @@
             justify-content: center;
             font-size: 1rem;
         }
-
         .fab-option.withdrawal .fab-option-icon { background: var(--accent-success); }
         .fab-option.expense .fab-option-icon { background: var(--accent-danger); }
         .fab-option.adjust .fab-option-icon { background: var(--accent-warning); }
-
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -515,12 +407,10 @@
             opacity: 0;
             transition: opacity 0.3s;
         }
-
         .modal-overlay.active {
             display: flex;
             opacity: 1;
         }
-
         .modal-sheet {
             background: var(--bg-secondary);
             width: 100%;
@@ -533,11 +423,9 @@
             flex-direction: column;
             overflow: hidden;
         }
-
         .modal-overlay.active .modal-sheet {
             transform: translateY(0);
         }
-
         .modal-header {
             padding: var(--spacing-lg);
             border-bottom: 1px solid var(--border-subtle);
@@ -546,13 +434,11 @@
             align-items: center;
             flex-shrink: 0;
         }
-
         .modal-title {
             font-size: 1.25rem;
             font-weight: 600;
             color: var(--text-primary);
         }
-
         .modal-close {
             width: 32px;
             height: 32px;
@@ -566,18 +452,15 @@
             align-items: center;
             justify-content: center;
         }
-
         .modal-content {
             flex: 1;
             overflow-y: auto;
             padding: var(--spacing-lg);
             -webkit-overflow-scrolling: touch;
         }
-
         .form-group {
             margin-bottom: var(--spacing-lg);
         }
-
         .form-label {
             display: block;
             font-size: 0.875rem;
@@ -585,7 +468,6 @@
             margin-bottom: var(--spacing-xs);
             font-weight: 500;
         }
-
         .form-input, .form-select {
             width: 100%;
             padding: var(--spacing-md);
@@ -597,21 +479,17 @@
             transition: border-color 0.2s;
             font-variant-numeric: tabular-nums;
         }
-
         .form-input:focus, .form-select:focus {
             outline: none;
             border-color: var(--accent-primary);
         }
-
         .form-input::placeholder {
             color: var(--text-secondary);
             opacity: 0.5;
         }
-
         .input-currency {
             position: relative;
         }
-
         .currency-symbol {
             position: absolute;
             left: var(--spacing-md);
@@ -620,109 +498,14 @@
             color: var(--text-secondary);
             font-weight: 500;
         }
-
         .input-currency .form-input {
             padding-left: 2.5rem;
         }
-
         .form-hint {
             font-size: 0.75rem;
             color: var(--text-secondary);
             margin-top: var(--spacing-xs);
         }
-
-        .source-selector {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-sm);
-            max-height: 250px;
-            overflow-y: auto;
-            padding: var(--spacing-sm);
-            background: var(--bg-primary);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border-subtle);
-        }
-
-        .source-option {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: var(--spacing-md);
-            background: var(--bg-secondary);
-            border: 2px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .source-option:hover {
-            border-color: var(--accent-primary);
-            transform: translateX(4px);
-        }
-
-        .source-option.selected {
-            border-color: var(--accent-primary);
-            background: rgba(59, 130, 246, 0.1);
-        }
-
-        .source-option.cash-option {
-            border-style: dashed;
-            background: rgba(16, 185, 129, 0.05);
-        }
-
-        .source-option.cash-option.selected {
-            background: rgba(16, 185, 129, 0.15);
-            border-color: var(--accent-success);
-        }
-
-        .source-option.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .source-info {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .source-id {
-            font-family: monospace;
-            font-size: 0.875rem;
-            color: var(--accent-primary);
-            font-weight: 600;
-        }
-
-        .source-option.cash-option .source-id {
-            color: var(--accent-success);
-        }
-
-        .source-balance {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-            margin-top: 0.25rem;
-        }
-
-        .source-radio {
-            width: 24px;
-            height: 24px;
-            border: 2px solid var(--border-subtle);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-
-        .source-option.selected .source-radio {
-            border-color: var(--accent-primary);
-            background: var(--accent-primary);
-        }
-
-        .source-option.cash-option.selected .source-radio {
-            border-color: var(--accent-success);
-            background: var(--accent-success);
-        }
-
         .btn {
             width: 100%;
             padding: var(--spacing-md);
@@ -737,38 +520,31 @@
             justify-content: center;
             gap: var(--spacing-sm);
         }
-
         .btn-primary {
             background: var(--accent-primary);
             color: white;
         }
-
         .btn-primary:hover {
             background: #2563eb;
         }
-
         .btn-primary:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
-
         .btn-secondary {
             background: var(--bg-tertiary);
             color: var(--text-primary);
         }
-
         .btn-danger {
             background: rgba(239, 68, 68, 0.2);
             color: var(--accent-danger);
             border: 1px solid var(--accent-danger);
         }
-
         .history-list {
             display: flex;
             flex-direction: column;
             gap: var(--spacing-sm);
         }
-
         .history-item {
             display: flex;
             justify-content: space-between;
@@ -780,12 +556,10 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-
         .history-item:hover {
             border-color: var(--accent-primary);
             background: var(--bg-tertiary);
         }
-
         .history-type {
             width: 40px;
             height: 40px;
@@ -796,62 +570,49 @@
             font-size: 1.25rem;
             margin-right: var(--spacing-md);
         }
-
         .history-type.withdrawal { background: rgba(16, 185, 129, 0.2); color: var(--accent-success); }
         .history-type.expense { background: rgba(239, 68, 68, 0.2); color: var(--accent-danger); }
         .history-type.adjustment { background: rgba(245, 158, 11, 0.2); color: var(--accent-warning); }
-
         .history-details {
             flex: 1;
         }
-
         .history-title {
             font-weight: 500;
             color: var(--text-primary);
             margin-bottom: 0.125rem;
         }
-
         .history-meta {
             font-size: 0.75rem;
             color: var(--text-secondary);
         }
-
         .history-amount {
             font-weight: 600;
             font-variant-numeric: tabular-nums;
         }
-
         .history-amount.positive { color: var(--accent-success); }
         .history-amount.negative { color: var(--accent-danger); }
-
         .hidden { display: none !important; }
         .text-center { text-align: center; }
         .mt-md { margin-top: var(--spacing-md); }
         .mb-md { margin-bottom: var(--spacing-md); }
-
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
-
         ::-webkit-scrollbar-track {
             background: var(--bg-primary);
         }
-
         ::-webkit-scrollbar-thumb {
             background: var(--bg-tertiary);
             border-radius: 3px;
         }
-
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         .animate-in {
             animation: slideIn 0.3s ease-out;
         }
-
         .search-container {
             position: sticky;
             top: 0;
@@ -861,7 +622,6 @@
             border-bottom: 1px solid var(--border-subtle);
             margin-bottom: var(--spacing-md);
         }
-
         .search-input {
             width: 100%;
             padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) 2.5rem;
@@ -871,12 +631,10 @@
             color: var(--text-primary);
             font-size: 1rem;
         }
-
         .search-input:focus {
             outline: none;
             border-color: var(--accent-primary);
         }
-
         .search-icon {
             position: absolute;
             left: var(--spacing-md);
@@ -884,14 +642,12 @@
             transform: translateY(-50%);
             color: var(--text-secondary);
         }
-
         .report-filters {
             display: flex;
             gap: var(--spacing-sm);
             margin-bottom: var(--spacing-lg);
             flex-wrap: wrap;
         }
-
         .filter-btn {
             padding: var(--spacing-sm) var(--spacing-md);
             background: var(--bg-tertiary);
@@ -902,18 +658,15 @@
             font-size: 0.875rem;
             transition: all 0.2s;
         }
-
         .filter-btn:hover {
             border-color: var(--accent-primary);
             color: var(--text-primary);
         }
-
         .filter-btn.active {
             background: var(--accent-primary);
             color: white;
             border-color: var(--accent-primary);
         }
-
         .chart-container {
             position: relative;
             height: 300px;
@@ -923,21 +676,18 @@
             border-radius: var(--radius-md);
             border: 1px solid var(--border-subtle);
         }
-
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: var(--spacing-md);
             margin-bottom: var(--spacing-lg);
         }
-
         .stat-card {
             background: var(--bg-secondary);
             padding: var(--spacing-md);
             border-radius: var(--radius-md);
             border: 1px solid var(--border-subtle);
         }
-
         .stat-label {
             font-size: 0.75rem;
             color: var(--text-secondary);
@@ -945,35 +695,29 @@
             letter-spacing: 0.05em;
             margin-bottom: var(--spacing-xs);
         }
-
         .stat-value {
             font-size: 1.25rem;
             font-weight: 600;
             color: var(--text-primary);
             font-variant-numeric: tabular-nums;
         }
-
         .date-range-inputs {
             display: flex;
             gap: var(--spacing-md);
             margin-bottom: var(--spacing-md);
         }
-
         .date-range-inputs .form-group {
             flex: 1;
             margin-bottom: 0;
         }
-
         .edit-actions {
             display: flex;
             gap: var(--spacing-md);
             margin-top: var(--spacing-xl);
         }
-
         .edit-actions .btn {
             flex: 1;
         }
-
         .theme-toggle {
             position: relative;
             width: 60px;
@@ -984,11 +728,9 @@
             transition: background 0.3s;
             border: 1px solid var(--border-subtle);
         }
-
         .theme-toggle.active {
             background: var(--accent-primary);
         }
-
         .theme-toggle-slider {
             position: absolute;
             top: 3px;
@@ -1003,11 +745,40 @@
             justify-content: center;
             font-size: 0.875rem;
         }
-
         .theme-toggle.active .theme-toggle-slider {
             transform: translateX(28px);
         }
-
+        .category-select-container {
+            position: relative;
+        }
+        .custom-category-input {
+            margin-top: var(--spacing-sm);
+        }
+        .allocation-info {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+        .allocation-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-xs) 0;
+            font-size: 0.875rem;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .allocation-item:last-child {
+            border-bottom: none;
+        }
+        .allocation-source {
+            color: var(--text-secondary);
+        }
+        .allocation-amount {
+            color: var(--accent-danger);
+            font-weight: 500;
+        }
         @media (min-width: 481px) {
             #app {
                 border-left: 1px solid var(--border-subtle);
@@ -1019,7 +790,6 @@
 </head>
 <body>
     <div id="app">
-        <!-- App Header -->
         <header class="app-header">
             <div class="brand">💰 CashTrail</div>
             <div class="header-actions">
@@ -1030,10 +800,7 @@
                 <button class="icon-btn" id="btnSettings" title="Settings">⚙️</button>
             </div>
         </header>
-
-        <!-- Main Content Area -->
         <main class="main-content" id="mainContent">
-            <!-- Dashboard Hero -->
             <div class="cash-hero animate-in">
                 <div class="cash-label">Cash on Hand</div>
                 <div class="cash-amount">
@@ -1051,30 +818,17 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Active Withdrawals Section -->
             <div class="section-header">
                 <h2 class="section-title">Active Withdrawals</h2>
                 <button class="section-action" id="btnViewAll">View All</button>
             </div>
-
-            <div id="withdrawalsContainer" class="withdrawal-list">
-                <!-- Dynamic content -->
-            </div>
-
-            <!-- Recent Activity Section -->
+            <div id="withdrawalsContainer" class="withdrawal-list"></div>
             <div class="section-header">
                 <h2 class="section-title">Recent Activity</h2>
             </div>
-
-            <div id="recentActivityContainer" class="history-list">
-                <!-- Dynamic content -->
-            </div>
-
+            <div id="recentActivityContainer" class="history-list"></div>
             <div style="height: 100px;"></div>
         </main>
-
-        <!-- Floating Action Button -->
         <div class="fab-container">
             <div class="fab-menu" id="fabMenu">
                 <div class="fab-option withdrawal" onclick="app.openModal('withdrawal')">
@@ -1092,8 +846,6 @@
             </div>
             <button class="fab" id="fabMain">+</button>
         </div>
-
-        <!-- Modal: Withdrawal Form -->
         <div class="modal-overlay" id="modalWithdrawal">
             <div class="modal-sheet">
                 <div class="modal-header">
@@ -1110,7 +862,6 @@
                                 <input type="number" class="form-input" id="withdrawalAmount" step="0.01" min="0.01" required placeholder="0.00">
                             </div>
                         </div>
-
                         <div class="form-group">
                             <label class="form-label">Source</label>
                             <select class="form-select" id="withdrawalSource" required>
@@ -1125,29 +876,23 @@
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-
                         <div class="form-group">
                             <label class="form-label">Date</label>
                             <input type="date" class="form-input" id="withdrawalDate" required>
                         </div>
-
                         <div class="form-group">
                             <label class="form-label">Reference Number (Optional)</label>
                             <input type="text" class="form-input" id="withdrawalRef" placeholder="e.g., ATM receipt number">
-                            <div class="form-hint" id="withdrawalIdHint">Auto-generated ID will be shown after creation</div>
                         </div>
-
                         <div class="edit-actions" id="withdrawalEditActions" style="display: none;">
                             <button type="button" class="btn btn-danger" onclick="app.deleteTransaction('withdrawal', document.getElementById('withdrawalEditId').value)">Delete</button>
-                            <button type="submit" class="btn btn-primary">Update Withdrawal</button>
+                            <button type="submit" class="btn btn-primary">Update</button>
                         </div>
                         <button type="submit" class="btn btn-primary mt-md" id="withdrawalSubmitBtn">Record Withdrawal</button>
                     </form>
                 </div>
             </div>
         </div>
-
-        <!-- Modal: Expense Form -->
         <div class="modal-overlay" id="modalExpense">
             <div class="modal-sheet">
                 <div class="modal-header">
@@ -1161,55 +906,48 @@
                             <label class="form-label">Amount</label>
                             <div class="input-currency">
                                 <span class="currency-symbol" id="expenseCurrency">₱</span>
-                                <input type="number" class="form-input" id="expenseAmount" step="0.01" min="0.01" required placeholder="0.00">
+                                <input type="number" class="form-input" id="expenseAmount" step="0.01" min="0.01" required placeholder="0.00" oninput="app.calculateAllocationPreview()">
                             </div>
                         </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Source *</label>
-                            <div class="form-hint mb-md">Select withdrawal or use Cash on Hand:</div>
-                            <div class="source-selector" id="expenseSourceSelector">
-                                <!-- Dynamic source options -->
-                            </div>
-                            <input type="hidden" id="selectedWithdrawalId" required>
-                        </div>
-
                         <div class="form-group">
                             <label class="form-label">Category</label>
-                            <select class="form-select" id="expenseCategory" required>
-                                <option value="">Select category...</option>
-                                <option value="Food">Food & Dining</option>
-                                <option value="Transport">Transportation</option>
-                                <option value="Shopping">Shopping</option>
-                                <option value="Entertainment">Entertainment</option>
-                                <option value="Bills">Bills & Utilities</option>
-                                <option value="Health">Health & Medical</option>
-                                <option value="Groceries">Groceries</option>
-                                <option value="Others">Others</option>
-                            </select>
+                            <div class="category-select-container">
+                                <select class="form-select" id="expenseCategory" required onchange="app.handleCategoryChange()">
+                                    <option value="">Select category...</option>
+                                    <option value="Food">Food & Dining</option>
+                                    <option value="Transport">Transportation</option>
+                                    <option value="Shopping">Shopping</option>
+                                    <option value="Entertainment">Entertainment</option>
+                                    <option value="Bills">Bills & Utilities</option>
+                                    <option value="Health">Health & Medical</option>
+                                    <option value="Groceries">Groceries</option>
+                                    <option value="Others">Others</option>
+                                    <option value="custom">+ Add Custom Category</option>
+                                </select>
+                                <input type="text" class="form-input custom-category-input hidden" id="customCategoryInput" placeholder="Enter custom category name">
+                            </div>
                         </div>
-
                         <div class="form-group">
                             <label class="form-label">Note (Optional)</label>
                             <input type="text" class="form-input" id="expenseNote" placeholder="What did you spend on?">
                         </div>
-
                         <div class="form-group">
                             <label class="form-label">Date</label>
-                            <input type="date" class="form-input" id="expenseDate" required>
+                            <input type="date" class="form-input" id="expenseDate" required onchange="app.calculateAllocationPreview()">
                         </div>
-
+                        <div id="allocationPreview" class="allocation-info hidden">
+                            <label class="form-label">Auto-Allocation Preview (FIFO)</label>
+                            <div id="allocationList"></div>
+                        </div>
                         <div class="edit-actions" id="expenseEditActions" style="display: none;">
                             <button type="button" class="btn btn-danger" onclick="app.deleteTransaction('expense', document.getElementById('expenseEditId').value)">Delete</button>
-                            <button type="submit" class="btn btn-primary">Update Expense</button>
+                            <button type="submit" class="btn btn-primary">Update</button>
                         </div>
                         <button type="submit" class="btn btn-primary mt-md" id="expenseSubmitBtn">Record Expense</button>
                     </form>
                 </div>
             </div>
         </div>
-
-        <!-- Modal: Cash Adjustment -->
         <div class="modal-overlay" id="modalAdjustment">
             <div class="modal-sheet">
                 <div class="modal-header">
@@ -1223,7 +961,6 @@
                             <label class="form-label">Current Recorded Balance</label>
                             <div class="form-input" style="background: var(--bg-tertiary); color: var(--text-secondary);" id="currentRecordedBalance">₱0.00</div>
                         </div>
-
                         <div class="form-group">
                             <label class="form-label">Actual Cash Count</label>
                             <div class="input-currency">
@@ -1231,11 +968,11 @@
                                 <input type="number" class="form-input" id="adjustmentAmount" step="0.01" required placeholder="0.00">
                             </div>
                         </div>
-
                         <div class="form-group">
-                            <label class="form-label">Reason for Adjustment</label>
+                            <label class="form-label">Reason</label>
                             <select class="form-select" id="adjustmentReason" required>
                                 <option value="">Select reason...</option>
+                                <option value="Initial">Set Initial Cash</option>
                                 <option value="Miscount">Initial miscount</option>
                                 <option value="Lost">Lost/missing money</option>
                                 <option value="Found">Found extra cash</option>
@@ -1243,33 +980,23 @@
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-
                         <div class="form-group">
                             <label class="form-label">Note (Optional)</label>
                             <input type="text" class="form-input" id="adjustmentNote" placeholder="Additional details...">
                         </div>
-
                         <div class="form-group">
                             <label class="form-label">Date</label>
                             <input type="date" class="form-input" id="adjustmentDate" required>
                         </div>
-
-                        <div id="adjustmentPreview" class="form-group hidden">
-                            <label class="form-label">Adjustment Amount</label>
-                            <div class="form-input" id="adjustmentValue" style="font-weight: 600;"></div>
-                        </div>
-
                         <div class="edit-actions" id="adjustmentEditActions" style="display: none;">
                             <button type="button" class="btn btn-danger" onclick="app.deleteTransaction('adjustment', document.getElementById('adjustmentEditId').value)">Delete</button>
-                            <button type="submit" class="btn btn-primary">Update Adjustment</button>
+                            <button type="submit" class="btn btn-primary">Update</button>
                         </div>
                         <button type="submit" class="btn btn-primary mt-md" id="adjustmentSubmitBtn">Confirm Adjustment</button>
                     </form>
                 </div>
             </div>
         </div>
-
-        <!-- Modal: Search -->
         <div class="modal-overlay" id="modalSearch">
             <div class="modal-sheet" style="max-height: 95vh;">
                 <div class="modal-header">
@@ -1285,16 +1012,11 @@
                         <div class="empty-state">
                             <div class="empty-icon">🔍</div>
                             <div>Type to search transactions</div>
-                            <div style="font-size: 0.875rem; margin-top: var(--spacing-sm);">
-                                Search across all withdrawals, expenses, and adjustments
-                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Modal: Reports -->
         <div class="modal-overlay" id="modalReports">
             <div class="modal-sheet" style="max-height: 95vh;">
                 <div class="modal-header">
@@ -1309,7 +1031,6 @@
                         <button class="filter-btn" onclick="app.setReportRange('1year')">Year</button>
                         <button class="filter-btn" onclick="app.setReportRange('custom')">Custom</button>
                     </div>
-
                     <div id="customDateRange" class="hidden">
                         <div class="date-range-inputs">
                             <div class="form-group">
@@ -1322,7 +1043,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-label">Total Spent</div>
@@ -1341,21 +1061,16 @@
                             <div class="stat-value" id="reportTopCategory">-</div>
                         </div>
                     </div>
-
                     <div class="chart-container">
                         <canvas id="spendingChart"></canvas>
                     </div>
-
                     <div class="section-header" style="margin-top: 0;">
                         <h3 class="section-title">Category Breakdown</h3>
                     </div>
-                    <div id="categoryBreakdown" class="history-list">
-                    </div>
+                    <div id="categoryBreakdown" class="history-list"></div>
                 </div>
             </div>
         </div>
-
-        <!-- Modal: Withdrawal Details -->
         <div class="modal-overlay" id="modalWithdrawalDetails">
             <div class="modal-sheet" style="max-height: 95vh;">
                 <div class="modal-header">
@@ -1363,15 +1078,11 @@
                     <button class="modal-close" onclick="app.closeModal('withdrawalDetails')">×</button>
                 </div>
                 <div class="modal-content">
-                    <div id="withdrawalDetailsContent">
-                    </div>
-                    <div id="withdrawalExpensesList" class="history-list" style="margin-top: var(--spacing-lg);">
-                    </div>
+                    <div id="withdrawalDetailsContent"></div>
+                    <div id="withdrawalExpensesList" class="history-list" style="margin-top: var(--spacing-lg);"></div>
                 </div>
             </div>
         </div>
-
-        <!-- Modal: History (FULL TRANSACTION HISTORY) - THIS WAS MISSING -->
         <div class="modal-overlay" id="modalHistory">
             <div class="modal-sheet" style="max-height: 95vh;">
                 <div class="modal-header">
@@ -1379,14 +1090,10 @@
                     <button class="modal-close" onclick="app.closeModal('history')">×</button>
                 </div>
                 <div class="modal-content">
-                    <div id="fullHistoryList" class="history-list">
-                        <!-- Dynamic content populated by renderFullHistory() -->
-                    </div>
+                    <div id="fullHistoryList" class="history-list"></div>
                 </div>
             </div>
         </div>
-
-        <!-- Modal: Settings -->
         <div class="modal-overlay" id="modalSettings">
             <div class="modal-sheet">
                 <div class="modal-header">
@@ -1403,7 +1110,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="form-group">
                         <label class="form-label">Currency</label>
                         <select class="form-select" id="settingsCurrency" onchange="app.updateCurrency(this.value)">
@@ -1417,7 +1123,6 @@
                             <option value="CAD">CAD (C$) - Canadian Dollar</option>
                         </select>
                     </div>
-
                     <div class="form-group">
                         <label class="form-label">Data Management</label>
                         <button type="button" class="btn btn-secondary" onclick="app.exportData()">📥 Export Data (JSON)</button>
@@ -1426,14 +1131,12 @@
                         </div>
                         <input type="file" id="importFile" accept=".json" style="display: none;" onchange="app.handleImport(this)">
                     </div>
-
                     <div class="form-group mt-md">
                         <label class="form-label">Danger Zone</label>
                         <button type="button" class="btn btn-danger" onclick="app.clearAllData()">🗑️ Clear All Data</button>
                     </div>
-
                     <div class="form-group mt-md text-center">
-                        <div class="form-hint">CashTrail v2.1.0</div>
+                        <div class="form-hint">CashTrail v3.0.0 - FIFO Edition</div>
                         <div class="form-hint">Built with ❤️ for precise money tracking</div>
                     </div>
                 </div>
@@ -1442,7 +1145,6 @@
     </div>
 
     <script>
-        // Prevent zoom on double-tap
         let lastTouchEnd = 0;
         document.addEventListener('touchend', function(e) {
             const now = Date.now();
@@ -1452,14 +1154,12 @@
             lastTouchEnd = now;
         }, { passive: false });
 
-        // Prevent pinch zoom
         document.addEventListener('touchmove', function(e) {
             if (e.touches.length > 1) {
                 e.preventDefault();
             }
         }, { passive: false });
 
-        // Prevent double-tap zoom on buttons
         document.addEventListener('touchstart', function(e) {
             if (e.touches.length > 1) {
                 e.preventDefault();
@@ -1480,27 +1180,29 @@
                     expenses: [],
                     adjustments: [],
                     sequenceCounter: {},
-                    theme: 'dark'
+                    theme: 'dark',
+                    customCategories: []
                 };
                 this.chartInstance = null;
                 this.currentReportRange = '7days';
                 this.currentEditingWithdrawal = null;
-                
+
                 this.init();
             }
 
             init() {
                 this.loadState();
+                this.migrateData();
                 this.applyTheme();
                 this.bindEvents();
                 this.render();
-                
+
                 const today = new Date().toISOString().split('T')[0];
                 document.getElementById('withdrawalDate').value = today;
                 document.getElementById('expenseDate').value = today;
                 document.getElementById('adjustmentDate').value = today;
                 document.getElementById('reportEndDate').value = today;
-                
+
                 const lastMonth = new Date();
                 lastMonth.setDate(lastMonth.getDate() - 30);
                 document.getElementById('reportStartDate').value = lastMonth.toISOString().split('T')[0];
@@ -1519,11 +1221,23 @@
                             adjustments: [],
                             sequenceCounter: {},
                             theme: 'dark',
+                            customCategories: [],
                             ...parsed 
                         };
                     }
                 } catch (e) {
                     console.error('State load failed:', e);
+                }
+            }
+
+            migrateData() {
+                // Migrate old expenses linked to CASH_ON_HAND to use FIFO allocation
+                const cashOnHandExpenses = this.state.expenses.filter(e => e.withdrawalId === 'CASH_ON_HAND');
+                if (cashOnHandExpenses.length > 0) {
+                    console.log('Migrating ' + cashOnHandExpenses.length + ' CASH_ON_HAND expenses to FIFO allocation');
+                    this.state.expenses = this.state.expenses.filter(e => e.withdrawalId !== 'CASH_ON_HAND');
+                    this.recalculateAllBalances();
+                    this.saveState();
                 }
             }
 
@@ -1535,27 +1249,162 @@
                 }
             }
 
-            // Calculate actual Cash on Hand dynamically
+            getFundingSourcesFIFO() {
+                const sources = [];
+
+                if (this.state.initialCashOnHand > 0) {
+                    sources.push({
+                        id: 'INITIAL_CASH',
+                        type: 'initial',
+                        amount: this.state.initialCashOnHand,
+                        remaining: this.getInitialCashRemaining(),
+                        date: '1900-01-01',
+                        displayName: 'Initial Cash on Hand'
+                    });
+                }
+
+                const sortedWithdrawals = [...this.state.withdrawals]
+                    .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+                sortedWithdrawals.forEach(w => {
+                    sources.push({
+                        id: w.id,
+                        type: 'withdrawal',
+                        amount: w.amount,
+                        remaining: w.remaining,
+                        date: w.date,
+                        source: w.source,
+                        displayName: w.id + ' (' + w.source + ')'
+                    });
+                });
+
+                return sources;
+            }
+
+            getInitialCashRemaining() {
+                let remaining = this.state.initialCashOnHand;
+
+                this.state.expenses.forEach(e => {
+                    if (e.allocations) {
+                        e.allocations.forEach(alloc => {
+                            if (alloc.sourceId === 'INITIAL_CASH') {
+                                remaining -= alloc.amount;
+                            }
+                        });
+                    }
+                });
+
+                return Math.max(0, remaining);
+            }
+
             getCashOnHand() {
-                let cash = this.state.initialCashOnHand || 0;
-                const totalWithdrawals = this.state.withdrawals.reduce((sum, w) => sum + w.amount, 0);
-                cash += totalWithdrawals;
-                const totalExpenses = this.state.expenses.reduce((sum, e) => sum + e.amount, 0);
-                cash -= totalExpenses;
-                const totalAdjustments = this.state.adjustments.reduce((sum, a) => sum + a.difference, 0);
-                cash += totalAdjustments;
-                return Math.max(0, cash);
+                let total = 0;
+                total += this.getInitialCashRemaining();
+
+                this.state.withdrawals.forEach(w => {
+                    total += w.remaining;
+                });
+
+                this.state.adjustments.forEach(a => {
+                    total += a.difference;
+                });
+
+                return Math.max(0, total);
+            }
+
+            allocateExpenseFIFO(amount) {
+                const sources = this.getFundingSourcesFIFO();
+                const allocations = [];
+                let remainingAmount = amount;
+
+                for (const source of sources) {
+                    if (remainingAmount <= 0) break;
+                    if (source.remaining <= 0) continue;
+
+                    const allocated = Math.min(remainingAmount, source.remaining);
+                    allocations.push({
+                        sourceId: source.id,
+                        sourceType: source.type,
+                        amount: allocated,
+                        sourceName: source.displayName
+                    });
+                    remainingAmount -= allocated;
+                }
+
+                return {
+                    allocations: allocations,
+                    fullyAllocated: remainingAmount <= 0,
+                    shortfall: remainingAmount > 0 ? remainingAmount : 0
+                };
+            }
+
+            applyAllocations(allocations) {
+                allocations.forEach(alloc => {
+                    if (alloc.sourceType === 'initial') {
+                        // Initial cash tracked through expenses
+                    } else {
+                        const withdrawal = this.state.withdrawals.find(w => w.id === alloc.sourceId);
+                        if (withdrawal) {
+                            withdrawal.remaining -= alloc.amount;
+                            if (withdrawal.remaining <= 0) {
+                                withdrawal.consumed = true;
+                                withdrawal.remaining = 0;
+                            }
+                        }
+                    }
+                });
+            }
+
+            reverseAllocations(allocations) {
+                allocations.forEach(alloc => {
+                    if (alloc.sourceType === 'initial') {
+                        // Initial cash tracked through expenses
+                    } else {
+                        const withdrawal = this.state.withdrawals.find(w => w.id === alloc.sourceId);
+                        if (withdrawal) {
+                            withdrawal.remaining += alloc.amount;
+                            withdrawal.consumed = false;
+                        }
+                    }
+                });
+            }
+
+            recalculateAllBalances() {
+                this.state.withdrawals.forEach(w => {
+                    w.remaining = w.amount;
+                    w.consumed = false;
+                });
+
+                const sortedExpenses = [...this.state.expenses]
+                    .sort((a, b) => new Date(a.date) - new Date(b.date) || a.createdAt - b.createdAt);
+
+                sortedExpenses.forEach(expense => {
+                    if (expense.allocations && expense.allocations.length > 0) {
+                        expense.allocations.forEach(alloc => {
+                            if (alloc.sourceType === 'withdrawal' || alloc.sourceId !== 'INITIAL_CASH') {
+                                const withdrawal = this.state.withdrawals.find(w => w.id === alloc.sourceId);
+                                if (withdrawal) {
+                                    withdrawal.remaining -= alloc.amount;
+                                    if (withdrawal.remaining <= 0) {
+                                        withdrawal.remaining = 0;
+                                        withdrawal.consumed = true;
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
             }
 
             applyTheme() {
                 const isDark = this.state.theme === 'dark';
                 document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-                
+
                 const btnTheme = document.getElementById('btnTheme');
                 if (btnTheme) {
                     btnTheme.textContent = isDark ? '🌙' : '☀️';
                 }
-                
+
                 const toggle = document.getElementById('themeToggle');
                 if (toggle) {
                     if (isDark) {
@@ -1578,11 +1427,10 @@
 
             bindEvents() {
                 const self = this;
-                
-                // FAB Toggle
+
                 const fab = document.getElementById('fabMain');
                 const menu = document.getElementById('fabMenu');
-                
+
                 fab.addEventListener('click', function(e) {
                     e.stopPropagation();
                     menu.classList.toggle('open');
@@ -1596,7 +1444,6 @@
                     }
                 });
 
-                // Modal close on overlay click
                 document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
                     overlay.addEventListener('click', function(e) {
                         if (e.target === overlay) {
@@ -1606,7 +1453,6 @@
                     });
                 });
 
-                // Header buttons - use bind to preserve context
                 document.getElementById('btnHistory').addEventListener('click', function() {
                     self.renderFullHistory();
                     self.openModal('history');
@@ -1627,7 +1473,6 @@
                     self.generateReport();
                 });
 
-                // THIS IS THE FIX - bind the method to preserve context
                 document.getElementById('btnTheme').addEventListener('click', function() {
                     self.toggleTheme();
                 });
@@ -1637,11 +1482,10 @@
                     self.openModal('history');
                 });
 
-                // Form inputs
                 document.getElementById('withdrawalSource').addEventListener('change', function(e) {
                     self.updateWithdrawalPreview(e.target.value);
                 });
-                
+
                 document.getElementById('withdrawalDate').addEventListener('change', function() {
                     const source = document.getElementById('withdrawalSource').value;
                     if (source) self.updateWithdrawalPreview(source);
@@ -1663,18 +1507,18 @@
                     'history': 'modalHistory',
                     'withdrawalDetails': 'modalWithdrawalDetails'
                 };
-                
+
                 const modalId = modalMap[type];
                 const modal = document.getElementById(modalId);
-                
+
                 if (modal) {
                     modal.classList.add('active');
                     document.body.style.overflow = 'hidden';
-                    
-                    if (type === 'expense') {
-                        this.renderSourceSelector();
-                    } else if (type === 'adjustment') {
+
+                    if (type === 'adjustment') {
                         this.prepareAdjustmentModal();
+                    } else if (type === 'expense') {
+                        this.calculateAllocationPreview();
                     }
                 }
             }
@@ -1690,19 +1534,19 @@
                     'history': 'modalHistory',
                     'withdrawalDetails': 'modalWithdrawalDetails'
                 };
-                
+
                 const modalId = modalMap[type];
                 const modal = document.getElementById(modalId);
-                
+
                 if (modal) {
                     modal.classList.remove('active');
                     document.body.style.overflow = '';
-                    
+
                     if (['withdrawal', 'expense', 'adjustment'].includes(type)) {
                         this.resetForm(type);
                     }
                 }
-                
+
                 document.getElementById('fabMenu').classList.remove('open');
                 document.getElementById('fabMain').textContent = '+';
             }
@@ -1710,44 +1554,93 @@
             resetForm(type) {
                 const form = document.getElementById(type + 'Form');
                 if (form) form.reset();
-                
+
                 document.getElementById(type + 'EditId').value = '';
                 document.getElementById(type + 'ModalTitle').textContent = 
                     type === 'withdrawal' ? 'Record Withdrawal' : 
                     type === 'expense' ? 'Record Expense' : 'Adjust Cash on Hand';
-                
+
                 const submitBtn = document.getElementById(type + 'SubmitBtn');
                 const editActions = document.getElementById(type + 'EditActions');
-                
+
                 if (submitBtn) submitBtn.style.display = 'block';
                 if (editActions) editActions.style.display = 'none';
-                
-                if (type === 'withdrawal') {
-                    document.getElementById('withdrawalIdHint').style.display = 'block';
+
+                if (type === 'expense') {
+                    document.getElementById('customCategoryInput').classList.add('hidden');
+                    document.getElementById('allocationPreview').classList.add('hidden');
                 }
-                
+
                 const today = new Date().toISOString().split('T')[0];
                 const dateInput = document.getElementById(type + 'Date');
                 if (dateInput) dateInput.value = today;
             }
 
-            editTransaction(type, id) {
-                let item;
-                if (type === 'withdrawal') {
-                    item = this.state.withdrawals.find(function(w) { return w.id === id; });
-                } else if (type === 'expense') {
-                    item = this.state.expenses.find(function(e) { return e.id === id; });
-                } else if (type === 'adjustment') {
-                    item = this.state.adjustments.find(function(a) { return a.id === id; });
-                }
+            handleCategoryChange() {
+                const select = document.getElementById('expenseCategory');
+                const customInput = document.getElementById('customCategoryInput');
 
-                if (!item) {
-                    console.error('Item not found:', type, id);
+                if (select.value === 'custom') {
+                    customInput.classList.remove('hidden');
+                    customInput.required = true;
+                    customInput.focus();
+                } else {
+                    customInput.classList.add('hidden');
+                    customInput.required = false;
+                    customInput.value = '';
+                }
+            }
+
+            calculateAllocationPreview() {
+                const amount = parseFloat(document.getElementById('expenseAmount').value) || 0;
+                const preview = document.getElementById('allocationPreview');
+                const list = document.getElementById('allocationList');
+
+                if (amount <= 0) {
+                    preview.classList.add('hidden');
                     return;
                 }
 
+                const result = this.allocateExpenseFIFO(amount);
+
+                if (result.allocations.length === 0) {
+                    list.innerHTML = '<div style="color: var(--accent-danger);">No available funding sources</div>';
+                    preview.classList.remove('hidden');
+                    return;
+                }
+
+                let html = result.allocations.map(alloc => `
+                    <div class="allocation-item">
+                        <span class="allocation-source">${alloc.sourceName}</span>
+                        <span class="allocation-amount">-${this.formatMoney(alloc.amount)}</span>
+                    </div>
+                `).join('');
+
+                if (!result.fullyAllocated) {
+                    html += `<div class="allocation-item" style="color: var(--accent-danger); font-weight: 600;">
+                        <span>SHORTFALL</span>
+                        <span>${this.formatMoney(result.shortfall)}</span>
+                    </div>`;
+                }
+
+                list.innerHTML = html;
+                preview.classList.remove('hidden');
+            }
+
+            editTransaction(type, id) {
+                let item;
+                if (type === 'withdrawal') {
+                    item = this.state.withdrawals.find(w => w.id === id);
+                } else if (type === 'expense') {
+                    item = this.state.expenses.find(e => e.id === id);
+                } else if (type === 'adjustment') {
+                    item = this.state.adjustments.find(a => a.id === id);
+                }
+
+                if (!item) return;
+
                 this.openModal(type);
-                
+
                 document.getElementById(type + 'EditId').value = id;
                 document.getElementById(type + 'ModalTitle').textContent = 'Edit ' + type.charAt(0).toUpperCase() + type.slice(1);
                 document.getElementById(type + 'SubmitBtn').style.display = 'none';
@@ -1758,15 +1651,23 @@
                     document.getElementById('withdrawalSource').value = item.source;
                     document.getElementById('withdrawalDate').value = item.date;
                     document.getElementById('withdrawalRef').value = item.reference || '';
-                    document.getElementById('withdrawalIdHint').style.display = 'none';
                 } else if (type === 'expense') {
                     document.getElementById('expenseAmount').value = item.amount;
-                    document.getElementById('expenseCategory').value = item.category;
+
+                    const presetCategories = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Health', 'Groceries', 'Others'];
+                    if (presetCategories.includes(item.category)) {
+                        document.getElementById('expenseCategory').value = item.category;
+                        document.getElementById('customCategoryInput').classList.add('hidden');
+                    } else {
+                        document.getElementById('expenseCategory').value = 'custom';
+                        document.getElementById('customCategoryInput').classList.remove('hidden');
+                        document.getElementById('customCategoryInput').value = item.category;
+                    }
+
                     document.getElementById('expenseNote').value = item.note || '';
                     document.getElementById('expenseDate').value = item.date;
-                    document.getElementById('selectedWithdrawalId').value = item.withdrawalId;
-                    
-                    this.renderSourceSelector(item.withdrawalId);
+
+                    this.calculateAllocationPreview();
                 } else if (type === 'adjustment') {
                     document.getElementById('adjustmentAmount').value = item.newBalance;
                     document.getElementById('adjustmentReason').value = item.reason;
@@ -1778,15 +1679,19 @@
 
             showWithdrawalDetails(withdrawalId) {
                 this.currentEditingWithdrawal = withdrawalId;
-                const w = this.state.withdrawals.find(function(w) { return w.id === withdrawalId; });
+                const w = this.state.withdrawals.find(w => w.id === withdrawalId);
                 if (!w) return;
 
-                const expenses = this.state.expenses.filter(function(e) { return e.withdrawalId === withdrawalId; })
-                    .sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+                const expenses = this.state.expenses.filter(e => 
+                    e.allocations && e.allocations.some(a => a.sourceId === withdrawalId)
+                ).sort((a, b) => new Date(b.date) - new Date(a.date));
 
                 document.getElementById('withdrawalDetailsTitle').textContent = 'Withdrawal ' + withdrawalId;
-                
-                const totalSpent = expenses.reduce(function(sum, e) { return sum + e.amount; }, 0);
+
+                const totalSpent = expenses.reduce((sum, e) => {
+                    const alloc = e.allocations.find(a => a.sourceId === withdrawalId);
+                    return sum + (alloc ? alloc.amount : 0);
+                }, 0);
                 const progress = ((w.amount - w.remaining) / w.amount) * 100;
 
                 document.getElementById('withdrawalDetailsContent').innerHTML = `
@@ -1819,7 +1724,6 @@
                     </div>
                     <div style="display: flex; gap: var(--spacing-sm); margin-bottom: var(--spacing-md);">
                         <button type="button" class="btn btn-secondary" onclick="app.editTransaction('withdrawal', '${w.id}')" style="flex: 1; font-size: 0.875rem; padding: var(--spacing-sm);">✏️ Edit Withdrawal</button>
-                        <button type="button" class="btn btn-primary" onclick="app.addExpenseToWithdrawal('${w.id}')" style="flex: 1; font-size: 0.875rem; padding: var(--spacing-sm);">➕ Add Expense</button>
                     </div>
                     <h4 style="margin-bottom: var(--spacing-md); color: var(--text-secondary); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">Linked Expenses (${expenses.length})</h4>
                 `;
@@ -1832,16 +1736,16 @@
                         </div>
                     `;
                 } else {
-                    const self = this;
-                    document.getElementById('withdrawalExpensesList').innerHTML = expenses.map(function(e) {
+                    document.getElementById('withdrawalExpensesList').innerHTML = expenses.map(e => {
+                        const alloc = e.allocations.find(a => a.sourceId === withdrawalId);
                         return `
-                            <div class="history-item" onclick="app.editExpenseFromDetails('${e.id}')">
+                            <div class="history-item" onclick="app.editTransaction('expense', '${e.id}')">
                                 <div class="history-type expense">💸</div>
                                 <div class="history-details">
                                     <div class="history-title">${e.category}${e.note ? ' • ' + e.note : ''}</div>
-                                    <div class="history-meta">${self.formatDate(e.date)}</div>
+                                    <div class="history-meta">${this.formatDate(e.date)} • Allocated: ${this.formatMoney(alloc ? alloc.amount : 0)}</div>
                                 </div>
-                                <div class="history-amount negative">-${self.formatMoney(e.amount)}</div>
+                                <div class="history-amount negative">-${this.formatMoney(e.amount)}</div>
                             </div>
                         `;
                     }).join('');
@@ -1850,45 +1754,32 @@
                 this.openModal('withdrawalDetails');
             }
 
-            addExpenseToWithdrawal(withdrawalId) {
-                this.closeModal('withdrawalDetails');
-                const self = this;
-                setTimeout(function() {
-                    self.openModal('expense');
-                    document.getElementById('selectedWithdrawalId').value = withdrawalId;
-                    self.renderSourceSelector(withdrawalId);
-                }, 300);
-            }
-
-            editExpenseFromDetails(expenseId) {
-                this.closeModal('withdrawalDetails');
-                const self = this;
-                setTimeout(function() {
-                    self.editTransaction('expense', expenseId);
-                }, 300);
-            }
-
             deleteTransaction(type, id) {
                 if (!confirm('Are you sure you want to delete this transaction? This cannot be undone.')) return;
 
                 if (type === 'withdrawal') {
-                    const idx = this.state.withdrawals.findIndex(function(w) { return w.id === id; });
+                    const idx = this.state.withdrawals.findIndex(w => w.id === id);
                     if (idx > -1) {
-                        const w = this.state.withdrawals[idx];
-                        const hasExpenses = this.state.expenses.some(function(e) { return e.withdrawalId === id; });
+                        const hasExpenses = this.state.expenses.some(e => 
+                            e.allocations && e.allocations.some(a => a.sourceId === id)
+                        );
                         if (hasExpenses) {
-                            alert('Cannot delete withdrawal with linked expenses. Delete expenses first or reassign them.');
+                            alert('Cannot delete withdrawal with linked expenses. Delete expenses first.');
                             return;
                         }
                         this.state.withdrawals.splice(idx, 1);
                     }
                 } else if (type === 'expense') {
-                    const idx = this.state.expenses.findIndex(function(e) { return e.id === id; });
+                    const idx = this.state.expenses.findIndex(e => e.id === id);
                     if (idx > -1) {
+                        const exp = this.state.expenses[idx];
+                        if (exp.allocations) {
+                            this.reverseAllocations(exp.allocations);
+                        }
                         this.state.expenses.splice(idx, 1);
                     }
                 } else if (type === 'adjustment') {
-                    const idx = this.state.adjustments.findIndex(function(a) { return a.id === id; });
+                    const idx = this.state.adjustments.findIndex(a => a.id === id);
                     if (idx > -1) {
                         this.state.adjustments.splice(idx, 1);
                     }
@@ -1909,18 +1800,19 @@
                 const ref = document.getElementById('withdrawalRef').value;
 
                 if (editId) {
-                    const w = this.state.withdrawals.find(function(w) { return w.id === editId; });
+                    const w = this.state.withdrawals.find(w => w.id === editId);
                     if (w) {
                         const diff = amount - w.amount;
                         w.amount = amount;
                         w.source = source;
                         w.date = date;
                         w.reference = ref;
-                        w.remaining += diff;
+                        w.remaining = Math.max(0, w.remaining + diff);
+                        if (w.remaining <= 0) w.consumed = true;
                     }
                 } else {
                     const formattedDate = date.replace(/-/g, '').slice(2);
-                    const existing = this.state.withdrawals.filter(function(w) { return w.id.startsWith(source + '-' + formattedDate); }).length;
+                    const existing = this.state.withdrawals.filter(w => w.id.startsWith(source + '-' + formattedDate)).length;
                     const sequence = String(existing + 1).padStart(3, '0');
                     const controlNumber = source + '-' + formattedDate + '-' + sequence;
 
@@ -1947,82 +1839,56 @@
 
             handleExpenseSubmit(e) {
                 e.preventDefault();
-                const self = this;
                 const editId = document.getElementById('expenseEditId').value;
                 const amount = parseFloat(document.getElementById('expenseAmount').value);
-                const withdrawalId = document.getElementById('selectedWithdrawalId').value;
-                const category = document.getElementById('expenseCategory').value;
-                const note = document.getElementById('expenseNote').value;
-                const date = document.getElementById('expenseDate').value;
 
-                if (!withdrawalId) {
-                    alert('Please select a source');
-                    return;
-                }
-
-                const isCashOnHand = withdrawalId === 'CASH_ON_HAND';
-                
-                if (!isCashOnHand) {
-                    const withdrawal = this.state.withdrawals.find(function(w) { return w.id === withdrawalId; });
-                    if (!withdrawal) {
-                        alert('Selected withdrawal not found');
+                let category = document.getElementById('expenseCategory').value;
+                if (category === 'custom') {
+                    category = document.getElementById('customCategoryInput').value.trim();
+                    if (!category) {
+                        alert('Please enter a custom category name');
                         return;
+                    }
+                    if (!this.state.customCategories.includes(category)) {
+                        this.state.customCategories.push(category);
                     }
                 }
 
+                const note = document.getElementById('expenseNote').value;
+                const date = document.getElementById('expenseDate').value;
+
                 if (editId) {
-                    const exp = this.state.expenses.find(function(ex) { return ex.id === editId; });
+                    const exp = this.state.expenses.find(e => e.id === editId);
                     if (exp) {
-                        if (exp.withdrawalId !== withdrawalId || exp.amount !== amount) {
-                            if (exp.withdrawalId !== 'CASH_ON_HAND') {
-                                const oldW = this.state.withdrawals.find(function(w) { return w.id === exp.withdrawalId; });
-                                if (oldW) {
-                                    oldW.remaining += exp.amount;
-                                    oldW.consumed = false;
-                                }
-                            }
-                            
-                            if (withdrawalId === 'CASH_ON_HAND') {
-                                const currentCash = this.getCashOnHand();
-                                const oldCashImpact = exp.withdrawalId === 'CASH_ON_HAND' ? exp.amount : 0;
-                                const availableCash = currentCash + oldCashImpact;
-                                if (availableCash < amount) {
-                                    alert('Insufficient cash on hand');
-                                    return;
-                                }
-                            } else {
-                                const newW = this.state.withdrawals.find(function(w) { return w.id === withdrawalId; });
-                                if (newW.remaining < amount) {
-                                    alert('Insufficient balance in selected withdrawal');
-                                    return;
-                                }
-                                newW.remaining -= amount;
-                                if (newW.remaining <= 0) newW.consumed = true;
-                            }
+                        if (exp.allocations) {
+                            this.reverseAllocations(exp.allocations);
                         }
-                        
+
+                        const result = this.allocateExpenseFIFO(amount);
+                        if (!result.fullyAllocated) {
+                            alert('Insufficient funds. Shortfall: ' + this.formatMoney(result.shortfall));
+                            if (exp.allocations) {
+                                this.applyAllocations(exp.allocations);
+                            }
+                            return;
+                        }
+
+                        this.applyAllocations(result.allocations);
+
                         exp.amount = amount;
                         exp.category = category;
                         exp.note = note;
                         exp.date = date;
-                        exp.withdrawalId = withdrawalId;
+                        exp.allocations = result.allocations;
                     }
                 } else {
-                    if (isCashOnHand) {
-                        const currentCash = this.getCashOnHand();
-                        if (currentCash < amount) {
-                            alert('Insufficient cash on hand');
-                            return;
-                        }
-                    } else {
-                        const withdrawal = this.state.withdrawals.find(function(w) { return w.id === withdrawalId; });
-                        if (withdrawal.remaining < amount) {
-                            alert('Insufficient balance in selected withdrawal');
-                            return;
-                        }
-                        withdrawal.remaining -= amount;
-                        if (withdrawal.remaining <= 0) withdrawal.consumed = true;
+                    const result = this.allocateExpenseFIFO(amount);
+                    if (!result.fullyAllocated) {
+                        alert('Insufficient funds. Shortfall: ' + this.formatMoney(result.shortfall));
+                        return;
                     }
+
+                    this.applyAllocations(result.allocations);
 
                     const expense = {
                         id: 'EXP-' + Date.now(),
@@ -2031,7 +1897,7 @@
                         category: category,
                         note: note,
                         date: date,
-                        withdrawalId: withdrawalId,
+                        allocations: result.allocations,
                         createdAt: new Date().toISOString()
                     };
 
@@ -2053,7 +1919,7 @@
                 const date = document.getElementById('adjustmentDate').value;
 
                 if (editId) {
-                    const a = this.state.adjustments.find(function(adj) { return adj.id === editId; });
+                    const a = this.state.adjustments.find(adj => adj.id === editId);
                     if (a) {
                         a.newBalance = actualAmount;
                         a.reason = reason;
@@ -2065,6 +1931,10 @@
                 } else {
                     const previousBalance = this.getCashOnHand();
                     const difference = actualAmount - previousBalance;
+
+                    if (reason === 'Initial' && this.state.initialCashOnHand === 0) {
+                        this.state.initialCashOnHand = actualAmount;
+                    }
 
                     const adjustment = {
                         id: 'ADJ-' + Date.now(),
@@ -2087,100 +1957,13 @@
                 this.showNotification(editId ? 'Adjustment updated' : 'Cash adjusted');
             }
 
-            renderSourceSelector(selectedId) {
-                const container = document.getElementById('expenseSourceSelector');
-                const currentCash = this.getCashOnHand();
-                
-                const options = [];
-                
-                options.push({
-                    id: 'CASH_ON_HAND',
-                    displayId: '💵 CASH ON HAND',
-                    balance: currentCash,
-                    source: 'Direct Cash',
-                    isCash: true,
-                    disabled: currentCash <= 0 && selectedId !== 'CASH_ON_HAND'
-                });
-                
-                this.state.withdrawals
-                    .filter(function(w) { return w.remaining > 0 || w.id === selectedId; })
-                    .sort(function(a, b) { return new Date(b.date) - new Date(a.date); })
-                    .forEach(function(w) {
-                        options.push({
-                            id: w.id,
-                            displayId: w.id,
-                            balance: w.remaining,
-                            source: w.source,
-                            isCash: false,
-                            disabled: false
-                        });
-                    });
-
-                if (options.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state" style="padding: var(--spacing-md);">
-                            <div style="font-size: 2rem; margin-bottom: var(--spacing-sm);">⚠️</div>
-                            <div>No funding sources available.</div>
-                            <div style="font-size: 0.875rem; margin-top: var(--spacing-xs);">
-                                Record a withdrawal first.
-                            </div>
-                        </div>
-                    `;
-                    const submitBtn = document.getElementById('expenseSubmitBtn');
-                    if (submitBtn) submitBtn.disabled = true;
-                    return;
-                }
-
-                const submitBtn = document.getElementById('expenseSubmitBtn');
-                if (submitBtn) submitBtn.disabled = false;
-
-                const self = this;
-                container.innerHTML = options.map(function(opt) {
-                    const isSelected = selectedId === opt.id;
-                    const isDisabled = opt.disabled;
-                    const cashClass = opt.isCash ? 'cash-option' : '';
-                    const selectedClass = isSelected ? 'selected' : '';
-                    const disabledClass = isDisabled ? 'disabled' : '';
-                    const style = isDisabled ? 'opacity: 0.5; cursor: not-allowed;' : '';
-                    const onclick = isDisabled ? '' : 'onclick="app.selectWithdrawalSource(\'' + opt.id + '\', this)"';
-                    
-                    return `
-                        <div class="source-option ${cashClass} ${selectedClass} ${disabledClass}" 
-                             ${onclick}
-                             style="${style}">
-                            <div class="source-info">
-                                <div class="source-id">${opt.displayId}</div>
-                                <div class="source-balance">
-                                    ${opt.isCash ? 'Available: ' : 'Remaining: '}${self.formatMoney(opt.balance)} 
-                                    ${opt.isCash ? '' : ' • ' + opt.source}
-                                </div>
-                            </div>
-                            <div class="source-radio"></div>
-                        </div>
-                    `;
-                }).join('');
-                
-                if (selectedId) {
-                    document.getElementById('selectedWithdrawalId').value = selectedId;
-                }
-            }
-
-            selectWithdrawalSource(id, element) {
-                document.querySelectorAll('.source-option').forEach(function(el) { el.classList.remove('selected'); });
-                element.classList.add('selected');
-                document.getElementById('selectedWithdrawalId').value = id;
-            }
-
             updateWithdrawalPreview(source) {
                 if (!source) return;
                 const date = document.getElementById('withdrawalDate').value || new Date().toISOString().split('T')[0];
                 const formattedDate = date.replace(/-/g, '').slice(2);
-                const existing = this.state.withdrawals.filter(function(w) { return w.id.startsWith(source + '-' + formattedDate); }).length;
+                const existing = this.state.withdrawals.filter(w => w.id.startsWith(source + '-' + formattedDate)).length;
                 const sequence = String(existing + 1).padStart(3, '0');
                 const previewId = source + '-' + formattedDate + '-' + sequence;
-                
-                const hint = document.getElementById('previewId');
-                if (hint) hint.textContent = previewId;
             }
 
             prepareAdjustmentModal() {
@@ -2189,38 +1972,11 @@
                 if (balanceEl) {
                     balanceEl.textContent = CurrencySymbols[this.state.currency] + currentCash.toFixed(2);
                 }
-                const preview = document.getElementById('adjustmentPreview');
-                if (preview) preview.classList.add('hidden');
             }
 
             calculateAdjustment(actualAmount) {
                 const current = this.getCashOnHand();
                 const actual = parseFloat(actualAmount) || 0;
-                const diff = actual - current;
-                
-                const preview = document.getElementById('adjustmentPreview');
-                const value = document.getElementById('adjustmentValue');
-                
-                if (!preview || !value) return;
-                
-                if (actualAmount === '') {
-                    preview.classList.add('hidden');
-                    return;
-                }
-                
-                preview.classList.remove('hidden');
-                const symbol = CurrencySymbols[this.state.currency];
-                
-                if (diff > 0) {
-                    value.textContent = '+' + symbol + diff.toFixed(2) + ' (Cash increased)';
-                    value.style.color = 'var(--accent-success)';
-                } else if (diff < 0) {
-                    value.textContent = symbol + diff.toFixed(2) + ' (Cash decreased)';
-                    value.style.color = 'var(--accent-danger)';
-                } else {
-                    value.textContent = 'No adjustment needed';
-                    value.style.color = 'var(--text-secondary)';
-                }
             }
 
             handleSearch(query) {
@@ -2237,35 +1993,33 @@
 
                 const q = query.toLowerCase();
                 const results = [];
-                const self = this;
 
-                this.state.withdrawals.forEach(function(w) {
+                this.state.withdrawals.forEach(w => {
                     if (w.id.toLowerCase().includes(q) || 
                         w.source.toLowerCase().includes(q) ||
                         w.amount.toString().includes(q) ||
                         (w.reference && w.reference.toLowerCase().includes(q))) {
-                        results.push(Object.assign({}, w, {displayType: 'withdrawal'}));
+                        results.push({...w, displayType: 'withdrawal'});
                     }
                 });
 
-                this.state.expenses.forEach(function(e) {
+                this.state.expenses.forEach(e => {
                     if (e.category.toLowerCase().includes(q) || 
                         (e.note && e.note.toLowerCase().includes(q)) ||
-                        e.amount.toString().includes(q) ||
-                        e.withdrawalId.toLowerCase().includes(q)) {
-                        results.push(Object.assign({}, e, {displayType: 'expense'}));
+                        e.amount.toString().includes(q)) {
+                        results.push({...e, displayType: 'expense'});
                     }
                 });
 
-                this.state.adjustments.forEach(function(a) {
+                this.state.adjustments.forEach(a => {
                     if (a.reason.toLowerCase().includes(q) || 
                         (a.note && a.note.toLowerCase().includes(q)) ||
                         a.difference.toString().includes(q)) {
-                        results.push(Object.assign({}, a, {displayType: 'adjustment'}));
+                        results.push({...a, displayType: 'adjustment'});
                     }
                 });
 
-                results.sort(function(a, b) { return new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date); });
+                results.sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date));
 
                 if (results.length === 0) {
                     container.innerHTML = `
@@ -2277,15 +2031,15 @@
                     return;
                 }
 
-                container.innerHTML = results.map(function(t) { return self.renderSearchResult(t); }).join('');
+                container.innerHTML = results.map(t => this.renderSearchResult(t)).join('');
             }
 
             renderSearchResult(t) {
                 const isWithdrawal = t.displayType === 'withdrawal';
                 const isExpense = t.displayType === 'expense';
-                
+
                 let icon, title, meta, amount, amountClass;
-                
+
                 if (isWithdrawal) {
                     icon = '⬇️';
                     title = t.source + ' Withdrawal';
@@ -2295,7 +2049,7 @@
                 } else if (isExpense) {
                     icon = '💸';
                     title = t.category;
-                    meta = (t.note || 'No note') + ' • From: ' + t.withdrawalId + ' • ' + this.formatDate(t.date);
+                    meta = (t.note || 'No note') + ' • ' + this.formatDate(t.date);
                     amount = '-' + this.formatMoney(t.amount);
                     amountClass = 'negative';
                 } else {
@@ -2320,11 +2074,11 @@
 
             setReportRange(range) {
                 this.currentReportRange = range;
-                
-                document.querySelectorAll('.filter-btn').forEach(function(btn) {
+
+                document.querySelectorAll('.filter-btn').forEach(btn => {
                     btn.classList.remove('active');
                 });
-                
+
                 event.target.classList.add('active');
 
                 const customRange = document.getElementById('customDateRange');
@@ -2365,23 +2119,23 @@
                         break;
                 }
 
-                const filteredExpenses = this.state.expenses.filter(function(e) {
+                const filteredExpenses = this.state.expenses.filter(e => {
                     const d = new Date(e.date);
                     return d >= startDate && d <= endDate;
                 });
 
-                const totalSpent = filteredExpenses.reduce(function(sum, e) { return sum + e.amount; }, 0);
+                const totalSpent = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
                 const transactionCount = filteredExpenses.length;
-                
+
                 const daysDiff = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
                 const dailyAvg = totalSpent / daysDiff;
 
                 const categoryTotals = {};
-                filteredExpenses.forEach(function(e) {
+                filteredExpenses.forEach(e => {
                     categoryTotals[e.category] = (categoryTotals[e.category] || 0) + e.amount;
                 });
 
-                const sortedCategories = Object.entries(categoryTotals).sort(function(a, b) { return b[1] - a[1]; });
+                const sortedCategories = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
                 const topCategory = sortedCategories[0];
 
                 document.getElementById('reportTotalSpent').textContent = this.formatMoney(totalSpent);
@@ -2395,7 +2149,7 @@
 
             renderChart(categoryTotals) {
                 const ctx = document.getElementById('spendingChart').getContext('2d');
-                
+
                 if (this.chartInstance) {
                     this.chartInstance.destroy();
                 }
@@ -2408,8 +2162,7 @@
                 ];
 
                 const isDark = this.state.theme === 'dark';
-                const self = this;
-                
+
                 this.chartInstance = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
@@ -2440,11 +2193,11 @@
                                 borderColor: isDark ? '#475569' : '#cbd5e1',
                                 borderWidth: 1,
                                 callbacks: {
-                                    label: function(context) {
+                                    label: (context) => {
                                         const val = context.parsed;
-                                        const total = context.dataset.data.reduce(function(a, b) { return a + b; }, 0);
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
                                         const pct = ((val / total) * 100).toFixed(1);
-                                        return context.label + ': ' + self.formatMoney(val) + ' (' + pct + '%)';
+                                        return context.label + ': ' + this.formatMoney(val) + ' (' + pct + '%)';
                                     }
                                 }
                             }
@@ -2455,10 +2208,9 @@
 
             renderCategoryBreakdown(categoryTotals, total) {
                 const container = document.getElementById('categoryBreakdown');
-                const sorted = Object.entries(categoryTotals).sort(function(a, b) { return b[1] - a[1]; });
-                const self = this;
-                
-                container.innerHTML = sorted.map(function(item) {
+                const sorted = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1]);
+
+                container.innerHTML = sorted.map(item => {
                     const cat = item[0];
                     const amount = item[1];
                     const pct = ((amount / total) * 100).toFixed(1);
@@ -2468,7 +2220,7 @@
                                 <div class="history-title">${cat}</div>
                                 <div class="history-meta">${pct}% of total spending</div>
                             </div>
-                            <div class="history-amount negative">${self.formatMoney(amount)}</div>
+                            <div class="history-amount negative">${this.formatMoney(amount)}</div>
                         </div>
                     `;
                 }).join('');
@@ -2484,17 +2236,17 @@
                 const cashOnHand = this.getCashOnHand();
                 document.getElementById('cashAmount').textContent = cashOnHand.toFixed(2);
                 document.getElementById('currencyDisplay').textContent = this.state.currency;
-                
-                const active = this.state.withdrawals.filter(function(w) { return !w.consumed; }).length;
+
+                const active = this.state.withdrawals.filter(w => !w.consumed).length;
                 document.getElementById('activeWithdrawals').textContent = 
                     active + ' active withdrawal' + (active !== 1 ? 's' : '');
-                
+
                 const sevenDaysAgo = new Date();
                 sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-                
-                const recentExpenses = this.state.expenses.filter(function(e) { return new Date(e.date) >= sevenDaysAgo; });
-                const totalSpent = recentExpenses.reduce(function(sum, e) { return sum + e.amount; }, 0);
-                
+
+                const recentExpenses = this.state.expenses.filter(e => new Date(e.date) >= sevenDaysAgo);
+                const totalSpent = recentExpenses.reduce((sum, e) => sum + e.amount, 0);
+
                 const trendEl = document.getElementById('trendIndicator');
                 if (totalSpent > 0) {
                     trendEl.innerHTML = '<span>📉</span><span>' + this.formatMoney(totalSpent) + ' spent (7d)</span>';
@@ -2507,48 +2259,96 @@
 
             renderWithdrawals() {
                 const container = document.getElementById('withdrawalsContainer');
-                const activeWithdrawals = this.state.withdrawals.filter(function(w) { return !w.consumed; });
-                const self = this;
-                
-                if (activeWithdrawals.length === 0) {
+
+                const items = [];
+
+                if (this.state.initialCashOnHand > 0) {
+                    const initialRemaining = this.getInitialCashRemaining();
+                    items.push({
+                        id: 'INITIAL_CASH',
+                        type: 'initial',
+                        amount: this.state.initialCashOnHand,
+                        remaining: initialRemaining,
+                        date: 'Initial',
+                        consumed: initialRemaining <= 0
+                    });
+                }
+
+                const sortedWithdrawals = [...this.state.withdrawals]
+                    .sort((a, b) => new Date(b.date) - new Date(a.date));
+                items.push(...sortedWithdrawals);
+
+                const activeItems = items.filter(i => !i.consumed || i.type === 'initial');
+
+                if (activeItems.length === 0) {
                     container.innerHTML = `
                         <div class="empty-state">
                             <div class="empty-icon">💳</div>
                             <div>No active withdrawals</div>
                             <div style="font-size: 0.875rem; margin-top: var(--spacing-sm);">
-                                Record a withdrawal to start tracking
+                                Record a withdrawal or set initial cash to start tracking
                             </div>
                         </div>
                     `;
                     return;
                 }
-                
-                container.innerHTML = activeWithdrawals.map(function(w) {
-                    const linkedExpenses = self.state.expenses.filter(function(e) { return e.withdrawalId === w.id; });
-                    const progress = ((w.amount - w.remaining) / w.amount) * 100;
-                    
+
+                container.innerHTML = activeItems.map(item => {
+                    const isInitial = item.type === 'initial';
+                    const linkedExpenses = isInitial 
+                        ? this.state.expenses.filter(e => e.allocations && e.allocations.some(a => a.sourceId === 'INITIAL_CASH'))
+                        : this.state.expenses.filter(e => e.allocations && e.allocations.some(a => a.sourceId === item.id));
+                    const progress = ((item.amount - item.remaining) / item.amount) * 100;
+
+                    if (isInitial) {
+                        return `
+                            <div class="withdrawal-card initial-cash">
+                                <div class="withdrawal-header">
+                                    <div>
+                                        <div class="withdrawal-id initial-cash-id">INITIAL CASH</div>
+                                        <div class="withdrawal-source">
+                                            <span>💵</span>
+                                            <span>Starting Balance</span>
+                                        </div>
+                                    </div>
+                                    <div class="withdrawal-amounts">
+                                        <div class="withdrawal-total">${this.formatMoney(item.amount)}</div>
+                                        <div class="withdrawal-remaining ${item.remaining <= 0 ? 'depleted' : ''}">
+                                            ${this.formatMoney(item.remaining)} left
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="withdrawal-actions">
+                                    <button type="button" class="btn-small">
+                                        📋 Used in ${linkedExpenses.length} expenses
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+
                     return `
-                        <div class="withdrawal-card ${w.consumed ? 'consumed' : ''}">
-                            <div class="withdrawal-header" onclick="app.showWithdrawalDetails('${w.id}')">
+                        <div class="withdrawal-card ${item.consumed ? 'consumed' : ''}">
+                            <div class="withdrawal-header" onclick="app.showWithdrawalDetails('${item.id}')">
                                 <div>
-                                    <div class="withdrawal-id">${w.id}</div>
+                                    <div class="withdrawal-id">${item.id}</div>
                                     <div class="withdrawal-source">
                                         <span>🏦</span>
-                                        <span>${w.source} • ${self.formatDate(w.date)}</span>
+                                        <span>${item.source} • ${this.formatDate(item.date)}</span>
                                     </div>
                                 </div>
                                 <div class="withdrawal-amounts">
-                                    <div class="withdrawal-total">${self.formatMoney(w.amount)}</div>
-                                    <div class="withdrawal-remaining ${w.consumed ? 'depleted' : ''}">
-                                        ${self.formatMoney(w.remaining)} left
+                                    <div class="withdrawal-total">${this.formatMoney(item.amount)}</div>
+                                    <div class="withdrawal-remaining ${item.consumed ? 'depleted' : ''}">
+                                        ${this.formatMoney(item.remaining)} left
                                     </div>
                                 </div>
                             </div>
                             <div class="withdrawal-actions">
-                                <button type="button" class="btn-small" onclick="event.stopPropagation(); app.showWithdrawalDetails('${w.id}')">
+                                <button type="button" class="btn-small" onclick="event.stopPropagation(); app.showWithdrawalDetails('${item.id}')">
                                     📋 Details (${linkedExpenses.length})
                                 </button>
-                                <button type="button" class="btn-small" onclick="event.stopPropagation(); app.editTransaction('withdrawal', '${w.id}')">
+                                <button type="button" class="btn-small" onclick="event.stopPropagation(); app.editTransaction('withdrawal', '${item.id}')">
                                     ✏️ Edit
                                 </button>
                             </div>
@@ -2560,13 +2360,11 @@
             renderRecentActivity() {
                 const container = document.getElementById('recentActivityContainer');
                 const allTransactions = [
-                    ...this.state.withdrawals.map(function(w) { return Object.assign({}, w, {displayType: 'withdrawal'}); }),
-                    ...this.state.expenses.map(function(e) { return Object.assign({}, e, {displayType: 'expense'}); }),
-                    ...this.state.adjustments.map(function(a) { return Object.assign({}, a, {displayType: 'adjustment'}); })
-                ].sort(function(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); }).slice(0, 5);
-                
-                const self = this;
-                
+                    ...this.state.withdrawals.map(w => ({...w, displayType: 'withdrawal'})),
+                    ...this.state.expenses.map(e => ({...e, displayType: 'expense'})),
+                    ...this.state.adjustments.map(a => ({...a, displayType: 'adjustment'}))
+                ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5);
+
                 if (allTransactions.length === 0) {
                     container.innerHTML = `
                         <div class="empty-state" style="padding: var(--spacing-lg);">
@@ -2576,33 +2374,33 @@
                     `;
                     return;
                 }
-                
-                container.innerHTML = allTransactions.map(function(t) {
+
+                container.innerHTML = allTransactions.map(t => {
                     const isWithdrawal = t.displayType === 'withdrawal';
                     const isExpense = t.displayType === 'expense';
-                    
+
                     let icon, title, meta, amount, amountClass;
-                    
+
                     if (isWithdrawal) {
                         icon = '⬇️';
                         title = 'Withdrawal from ' + t.source;
                         meta = t.id;
-                        amount = '+' + self.formatMoney(t.amount);
+                        amount = '+' + this.formatMoney(t.amount);
                         amountClass = 'positive';
                     } else if (isExpense) {
                         icon = '💸';
                         title = t.category;
-                        meta = 'From ' + t.withdrawalId + ' • ' + self.formatDate(t.date);
-                        amount = '-' + self.formatMoney(t.amount);
+                        meta = this.formatDate(t.date);
+                        amount = '-' + this.formatMoney(t.amount);
                         amountClass = 'negative';
                     } else {
                         icon = t.difference > 0 ? '⬆️' : '⬇️';
                         title = 'Cash Adjustment';
                         meta = t.reason;
-                        amount = (t.difference > 0 ? '+' : '') + self.formatMoney(t.difference);
+                        amount = (t.difference > 0 ? '+' : '') + this.formatMoney(t.difference);
                         amountClass = t.difference > 0 ? 'positive' : 'negative';
                     }
-                    
+
                     return `
                         <div class="history-item animate-in" onclick="app.editTransaction('${t.displayType}', '${t.id}')">
                             <div class="history-type ${t.displayType}">${icon}</div>
@@ -2618,66 +2416,59 @@
 
             renderFullHistory() {
                 const container = document.getElementById('fullHistoryList');
-                
-                if (!container) {
-                    console.error('History modal container not found: fullHistoryList');
-                    return;
-                }
-                
+
+                if (!container) return;
+
                 const allTransactions = [
-                    ...this.state.withdrawals.map(function(w) { return Object.assign({}, w, {displayType: 'withdrawal'}); }),
-                    ...this.state.expenses.map(function(e) { return Object.assign({}, e, {displayType: 'expense'}); }),
-                    ...this.state.adjustments.map(function(a) { return Object.assign({}, a, {displayType: 'adjustment'}); })
-                ].sort(function(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
-                
+                    ...this.state.withdrawals.map(w => ({...w, displayType: 'withdrawal'})),
+                    ...this.state.expenses.map(e => ({...e, displayType: 'expense'})),
+                    ...this.state.adjustments.map(a => ({...a, displayType: 'adjustment'}))
+                ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
                 if (allTransactions.length === 0) {
                     container.innerHTML = '<div class="empty-state">No transaction history</div>';
                     return;
                 }
-                
-                const grouped = allTransactions.reduce(function(acc, t) {
+
+                const grouped = allTransactions.reduce((acc, t) => {
                     const date = t.date;
                     if (!acc[date]) acc[date] = [];
                     acc[date].push(t);
                     return acc;
                 }, {});
-                
-                const self = this;
-                container.innerHTML = Object.entries(grouped).map(function(group) {
-                    const date = group[0];
-                    const transactions = group[1];
-                    
+
+                container.innerHTML = Object.entries(grouped).map(([date, transactions]) => {
                     return `
                         <div style="margin-bottom: var(--spacing-lg);">
                             <div style="font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--spacing-sm); padding-left: var(--spacing-sm);">
-                                ${self.formatDateLong(date)}
+                                ${this.formatDateLong(date)}
                             </div>
-                            ${transactions.map(function(t) {
+                            ${transactions.map(t => {
                                 const isWithdrawal = t.displayType === 'withdrawal';
                                 const isExpense = t.displayType === 'expense';
-                                
+
                                 let icon, title, subtitle, amount, amountClass;
-                                
+
                                 if (isWithdrawal) {
                                     icon = '⬇️';
                                     title = 'Withdrawal • ' + t.source;
                                     subtitle = t.id;
-                                    amount = '+' + self.formatMoney(t.amount);
+                                    amount = '+' + this.formatMoney(t.amount);
                                     amountClass = 'positive';
                                 } else if (isExpense) {
                                     icon = '💸';
                                     title = t.category + (t.note ? ' • ' + t.note : '');
-                                    subtitle = 'From: ' + t.withdrawalId;
-                                    amount = '-' + self.formatMoney(t.amount);
+                                    subtitle = 'Allocated from: ' + (t.allocations ? t.allocations.map(a => a.sourceId === 'INITIAL_CASH' ? 'Initial Cash' : a.sourceId).join(', ') : 'Unknown');
+                                    amount = '-' + this.formatMoney(t.amount);
                                     amountClass = 'negative';
                                 } else {
                                     icon = t.difference > 0 ? '⬆️' : '⬇️';
                                     title = 'Adjustment • ' + t.reason;
-                                    subtitle = 'Recorded: ' + self.formatMoney(t.previousBalance) + ' → ' + self.formatMoney(t.newBalance);
-                                    amount = (t.difference > 0 ? '+' : '') + self.formatMoney(t.difference);
+                                    subtitle = 'Recorded: ' + this.formatMoney(t.previousBalance) + ' → ' + this.formatMoney(t.newBalance);
+                                    amount = (t.difference > 0 ? '+' : '') + this.formatMoney(t.difference);
                                     amountClass = t.difference > 0 ? 'positive' : 'negative';
                                 }
-                                
+
                                 return `
                                     <div class="history-item" style="margin-bottom: var(--spacing-sm);" onclick="app.editTransaction('${t.displayType}', '${t.id}')">
                                         <div class="history-type ${t.displayType}">${icon}</div>
@@ -2704,19 +2495,19 @@
                 const today = new Date();
                 const yesterday = new Date(today);
                 yesterday.setDate(yesterday.getDate() - 1);
-                
+
                 if (date.toDateString() === today.toDateString()) return 'Today';
                 if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
-                
+
                 return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
             }
 
             formatDateLong(dateStr) {
                 const date = new Date(dateStr);
                 const today = new Date();
-                
+
                 if (date.toDateString() === today.toDateString()) return 'Today';
-                
+
                 return date.toLocaleDateString('en-US', { 
                     weekday: 'short', 
                     year: 'numeric', 
@@ -2756,31 +2547,34 @@
             handleImport(input) {
                 const file = input.files[0];
                 if (!file) return;
-                
+
                 const reader = new FileReader();
-                const self = this;
-                reader.onload = function(e) {
+                reader.onload = (e) => {
                     try {
                         const imported = JSON.parse(e.target.result);
-                        
+
                         if (!imported.withdrawals || !imported.expenses || !Array.isArray(imported.withdrawals)) {
                             throw new Error('Invalid backup file format');
                         }
-                        
+
                         if (confirm('This will replace all current data. Continue?')) {
-                            self.state = { 
+                            this.state = { 
                                 currency: imported.currency || 'PHP',
                                 initialCashOnHand: imported.initialCashOnHand || 0,
                                 withdrawals: imported.withdrawals || [],
                                 expenses: imported.expenses || [],
                                 adjustments: imported.adjustments || [],
                                 sequenceCounter: imported.sequenceCounter || {},
-                                theme: imported.theme || 'dark'
+                                theme: imported.theme || 'dark',
+                                customCategories: imported.customCategories || []
                             };
-                            self.applyTheme();
-                            self.saveState();
-                            self.render();
-                            self.showNotification('Data imported successfully');
+
+                            this.recalculateAllBalances();
+
+                            this.applyTheme();
+                            this.saveState();
+                            this.render();
+                            this.showNotification('Data imported successfully');
                         }
                     } catch (err) {
                         alert('Failed to import: ' + err.message);
@@ -2800,7 +2594,8 @@
                             expenses: [],
                             adjustments: [],
                             sequenceCounter: {},
-                            theme: this.state.theme
+                            theme: this.state.theme,
+                            customCategories: []
                         };
                         this.saveState();
                         this.render();
@@ -2811,7 +2606,6 @@
             }
         }
 
-        // Initialize app
         let app;
         document.addEventListener('DOMContentLoaded', function() {
             app = new CashTrailApp();
@@ -2819,3 +2613,4 @@
     </script>
 </body>
 </html>
+
